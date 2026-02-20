@@ -1,0 +1,354 @@
+Mission
+
+Transform GitHub Digest from “top repos by total stars” into a daily discovery briefing that:
+
+surfaces new-to-you and rising repos (not just mega-projects),
+
+shows summaries for selected repos,
+
+refreshes automatically on a schedule,
+while preserving the existing fetch flow and today-board semantics.
+
+Non-negotiable invariants (do not violate)
+
+Do not rewrite the fetch flow. Keep the current fetch steps and meaning of repo_searches.last_seen_at.
+
+“Today board” must continue to mean: repos with repo_searches.last_seen_at = today (current UI logic).
+
+DB remains SQLite at the same path; existing tables and fields must not be renamed or removed.
+
+All new work must be additive: new columns/tables, new query paths, new CLI command(s), new scheduled job(s).
+
+All changes must be backed by:
+
+schema migration(s),
+
+unit tests (query logic),
+
+at least one end-to-end smoke test (fetch → summarize → board renders).
+
+Current baseline (assumed true)
+
+Fetch flow:
+
+Load saved searches from config/saved_searches.json
+
+For each search, call GitHub Search Repositories (sorted by stars)
+
+Upsert each repo into repos by github_id (update fields + set last_seen_at)
+
+Record repo/search association in repo_searches with its own last_seen_at
+
+Record run in runs with status and counts
+
+Refreshing = re-running github-digest fetch.
+
+UI “today board” filters by repo_searches.last_seen_at = today.
+
+Preserve all this.
+
+Deliverables (must produce all)
+D1. Database migrations (idempotent / safe)
+
+Add first_seen_at column to repos (DATETIME/TEXT ISO8601).
+
+Create table repo_stats_daily to track daily stars (and optionally forks/issues).
+
+Create table repo_summaries to store generated summaries and metadata.
+
+D2. Fetch enhancement (minimal)
+
+At the end of each fetch, write one repo_stats_daily row per seen repo for “today”.
+
+Must not increase API calls beyond current Search calls (no README fetch inside fetch).
+
+D3. New board modes + queries
+
+Add board sections (or toggles):
+
+New-to-you: first seen recently (default 7 days)
+
+Rising: stars gained (default 7 days delta)
+
+Updated: recent pushed, but with “anti-giant” filters (configurable)
+
+Default page should prioritize discovery modes, not all-time stars.
+
+D4. Summarization pipeline (separate command)
+
+Add CLI command: github-digest summarize
+
+Summarize only eligible repos (defined below), store results in repo_summaries.
+
+Summary must appear on UI for those repos.
+
+D5. Scheduling
+
+Provide systemd timers (preferred) or cron examples:
+
+fetch every 2 hours
+
+summarize once daily (or twice) with daily cap
+
+D6. Quality gates & tests
+
+Unit tests for:
+
+first_seen_at behavior,
+
+rising delta computation,
+
+eligibility selection & daily cap,
+
+idempotency (summarize doesn’t re-summarize unchanged repos).
+
+One E2E smoke test:
+
+run fetch on fixture data,
+
+run summarize,
+
+verify UI query returns items with summaries.
+
+Schema spec (exact)
+1) repos table: add column
+
+first_seen_at TEXT (ISO8601 string)
+Rules:
+
+On insert: set first_seen_at = now
+
+On upsert update: never overwrite first_seen_at
+
+2) repo_stats_daily
+CREATE TABLE IF NOT EXISTS repo_stats_daily (
+  repo_id INTEGER NOT NULL,
+  date TEXT NOT NULL,              -- YYYY-MM-DD
+  stars INTEGER NOT NULL,
+  forks INTEGER,
+  open_issues INTEGER,
+  PRIMARY KEY (repo_id, date),
+  FOREIGN KEY (repo_id) REFERENCES repos(id)
+);
+3) repo_summaries
+CREATE TABLE IF NOT EXISTS repo_summaries (
+  repo_id INTEGER PRIMARY KEY,
+  summary TEXT NOT NULL,
+  why_interesting TEXT NOT NULL,
+  tags TEXT NOT NULL,              -- JSON array as string
+  model TEXT,
+  source TEXT NOT NULL,            -- e.g. "metadata" or "readme"
+  updated_at TEXT NOT NULL,         -- ISO8601
+  FOREIGN KEY (repo_id) REFERENCES repos(id)
+);
+Discovery logic spec (exact)
+A) “New-to-you” selection
+
+Definition:
+
+repo is “new-to-you” if repos.first_seen_at >= now - N days (default N=7)
+
+For the Today board, prefer:
+
+repo_searches.last_seen_at = today
+
+AND repos.first_seen_at >= today_start (for “new today”) OR last 7 days (for “new this week”)
+
+Sorting:
+
+primary: repos.stargazers_count DESC
+
+secondary: repos.pushed_at DESC
+
+B) “Rising” selection (stars delta)
+
+Definition:
+
+delta = stars(today) − stars(on_or_before(today - N days))
+
+Use the closest snapshot on or before the target date.
+
+If baseline snapshot missing, delta is NULL; exclude from rising list.
+
+Sorting:
+
+primary: delta DESC
+
+secondary: stars(today) DESC
+
+Default filters (anti-giant):
+
+stars(today) BETWEEN 50 AND 20000 (configurable)
+
+C) “Updated” selection
+
+Definition:
+
+repos.pushed_at >= now - 30 days (configurable)
+
+Apply anti-giant stars range (same as above) unless user disables.
+
+Saved searches: guardrails (agent must implement)
+
+Add optional fields in saved_searches.json schema (backward compatible):
+
+label (display label)
+
+query (existing)
+
+mode_defaults (optional): recommended stars range, recency window
+
+exclude_known (optional): list of repo full_names to hard exclude (e.g., transformers/langchain)
+
+Rules:
+
+If these fields aren’t present, existing behavior remains unchanged.
+
+Don’t require config changes to run.
+
+Summarization spec (exact)
+Eligibility (must follow)
+
+A repo is eligible for summarization if:
+
+It is on today board (repo_searches.last_seen_at = today), AND
+
+It is either:
+
+New-to-you in last 7 days, OR
+
+In top K rising repos today (K configurable), OR
+
+Manually pinned (optional future, stub allowed)
+
+Daily cap:
+
+Summarize at most MAX_SUMMARIES_PER_DAY (default 30)
+
+Idempotency rules:
+
+If repo_summaries exists for repo and updated_at is within last 14 days AND repo metadata hasn’t materially changed, skip.
+Material change heuristic (choose one):
+
+repos.pushed_at changed since last summary, OR
+
+stars increased by ≥ X (e.g. 500), OR
+
+description/topics changed (if tracked)
+
+Input to model (Phase 1: metadata only)
+
+Use only:
+
+full_name, description, topics, language, stars, pushed_at, license (if present), homepage
+
+Output format (must validate)
+
+summary: 2–3 sentences
+
+why_interesting: exactly 1 sentence
+
+tags: JSON array of 3–6 short strings
+
+Hard validation:
+
+tags must be valid JSON array
+
+no empty strings
+
+enforce max length (e.g., summary <= 600 chars)
+
+Store in repo_summaries.
+
+Phase 2 (optional, behind feature flag)
+
+fetch README only for eligible repos
+
+source becomes "readme+metadata"
+
+UI requirements (must implement)
+
+On list items, if summary exists, render:
+
+summary
+
+why_interesting
+
+tags (chips/badges)
+
+Add controls:
+
+Mode: New / Rising / Updated (default New)
+
+Timeframe: 24h / 7d / 30d (default 7d)
+
+Keep current “Today’s picks from saved searches” concept intact.
+
+Scheduling deliverables (exact)
+
+Provide systemd unit + timer examples (checked into repo under deploy/):
+
+github-digest-fetch.service → runs github-digest fetch
+
+github-digest-fetch.timer → every 2 hours
+
+github-digest-summarize.service → runs github-digest summarize
+
+github-digest-summarize.timer → daily at 06:00
+
+Requirements:
+
+Use a file lock to avoid overlapping runs.
+
+Write run status to runs (new run_type allowed: fetch|summarize).
+
+Quality assurance harness (agent must run)
+Unit tests must cover
+
+first_seen_at preserved on upsert update
+
+daily stats snapshot upsert doesn’t duplicate rows
+
+rising delta computed correctly with missing intermediate days
+
+summarize eligibility and cap enforced
+
+summary output validation rejects bad JSON tags
+
+summarize is idempotent per rules
+
+E2E smoke test
+
+Use fixture DB in temp directory.
+
+Insert mocked GitHub search responses (no network).
+
+Run fetch code path.
+
+Run summarize (using deterministic stub model).
+
+Query Today board → assert summaries appear for eligible repos.
+
+“Don’t miss the point” saddle (common failure modes to avoid)
+
+❌ Do not rank by total stars only.
+
+❌ Do not summarize everything.
+
+❌ Do not fetch README inside fetch.
+
+❌ Do not change meaning of “today board”.
+
+❌ Do not add features that require external services to be usable (must run on current VM).
+
+Definition of Done (agent must satisfy)
+
+Running github-digest fetch twice updates last_seen_at and stats, preserves first_seen_at.
+
+UI shows New-to-you and Rising sections that surface non-giant repos (with default stars range).
+
+Running github-digest summarize creates summary rows for eligible repos and UI displays them.
+
+Scheduling files exist and are correct.
+
+Tests pass locally.

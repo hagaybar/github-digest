@@ -1,0 +1,33 @@
+[Unit]
+Description=GitHub Digest summarize job
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=github-digest
+Group=github-digest
+WorkingDirectory=/opt/github-digest
+EnvironmentFile=/etc/github-digest.env
+
+RuntimeDirectory=github-digest
+RuntimeDirectoryMode=0750
+
+ExecStart=/usr/bin/flock -n /run/github-digest/summarize.lock /opt/github-digest/.venv/bin/github-digest summarize --limit 30 --max-per-day 30
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+RestrictNamespaces=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/opt/github-digest /var/log/github-digest

@@ -1,0 +1,35 @@
+[Unit]
+Description=GitHub Digest API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=github-digest
+Group=github-digest
+WorkingDirectory=/opt/github-digest
+EnvironmentFile=/etc/github-digest.env
+
+RuntimeDirectory=github-digest
+RuntimeDirectoryMode=0750
+
+ExecStart=/opt/github-digest/.venv/bin/uvicorn github_digest.api.app:app --host 127.0.0.1 --port 8000
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+RestrictNamespaces=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/opt/github-digest /var/log/github-digest
+Restart=always
+RestartSec=5

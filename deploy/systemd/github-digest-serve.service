@@ -1,0 +1,15 @@
+[Unit]
+Description=GitHub Digest API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/github-digest
+EnvironmentFile=/etc/github-digest.env
+ExecStart=/opt/github-digest/.venv/bin/uvicorn github_digest.api.app:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,101 @@
+You are Codex working inside an EMPTY folder named `githu-digest/`.
+Goal: scaffold a small, robust “GitHub Digest” service:
+- Periodically fetch popular GitHub repos by topic/search query.
+- Store results in SQLite.
+- Optionally summarize selected repos via a local LLM later (stub for now).
+- Serve a small web UI + JSON endpoints.
+- Include logging, configuration, tests, linting/formatting, and deploy-friendly scripts.
+
+CONSTRAINTS
+- Use Python 3.11+.
+- Keep dependencies minimal and mainstream.
+- The project must run locally via `make dev` and in production via `make run`.
+- Use SQLite (file-based) and SQLAlchemy 2.x (or a lightweight alternative if you strongly prefer).
+- Do NOT implement the full product yet; focus on infrastructure + thin “happy path” that proves wiring works.
+- Add a safe rate-limited GitHub client using a token from env var (GITHUB_TOKEN). Support unauthenticated mode too.
+
+DELIVERABLES
+1) Create a full repo structure with these key components:
+   - `src/github_digest/` as the main package
+   - `api/` FastAPI app (or Flask if you prefer; choose one and commit)
+   - `db/` database models + migrations strategy (simple is OK: create tables on startup for v1)
+   - `services/`:
+        * `github_client.py` (REST calls, retry/backoff, rate-limit awareness)
+        * `fetcher.py` (runs saved searches, upserts repos)
+        * `summarizer.py` (STUB: interface + placeholder implementation)
+        * `board.py` (query DB for today’s board/top per topic)
+   - `cli.py` command-line entry point:
+        * `fetch` (run fetch once)
+        * `summarize` (stub; prints what it would do)
+        * `serve` (run the API)
+        * `health` (print basic DB + last run info)
+   - `config.py` using pydantic-settings (or envparse) with:
+        * DB path
+        * GitHub token
+        * list of “saved searches” in a yaml/json file
+        * fetch limits (per query, per run), throttle seconds, user-agent
+   - `data/` folder ignored by git (for sqlite db + runtime artifacts)
+   - `web/` minimal Jinja2 templates or static HTML (simple board page is enough)
+
+2) Provide project tooling:
+   - `pyproject.toml` with dependencies and console script entry point `github-digest`
+   - `Makefile` with: `dev`, `run`, `fetch`, `test`, `lint`, `format`
+   - `pytest` setup + at least 3 tests:
+        * config loads
+        * DB can create and insert a repo
+        * GitHub client query builder produces expected URL/params (mock requests)
+   - `ruff` for lint + format OR `black` + `ruff` (choose one consistent approach)
+   - `.gitignore` including `data/`, `.env`, `.venv`
+   - `README.md` with:
+        * quickstart
+        * how to set GITHUB_TOKEN
+        * example saved searches file
+        * how to run fetch + serve
+        * endpoints
+
+3) Implement minimal functionality end-to-end:
+   - Create SQLite schema:
+        * `repos` table: github_id, full_name, html_url, description, language, topics_json, stars, forks, open_issues, pushed_at, created_at, updated_at, first_seen_at, last_seen_at
+        * `repo_summaries` table: repo_id, summary, tags_json, model, created_at
+        * `runs` table: run_type (fetch/summarize), started_at, finished_at, status, detail
+   - Implement `fetch` that:
+        * loads saved searches (yaml or json) (include examples)
+        * for each search, calls GitHub Search Repositories endpoint
+        * upserts into DB
+        * records a run row
+        * logs remaining rate limit if available
+   - Implement API:
+        * GET `/health` returns last fetch time, repo count
+        * GET `/board/today` returns top N per query (derive from DB by last_seen_at = today)
+        * GET `/board/query/{name}` similar
+        * GET `/` renders a simple HTML page calling `/board/today`
+
+4) Scheduling hooks (don’t actually install services, just provide files):
+   - Provide `deploy/systemd/`:
+        * `github-digest-fetch.service` + `.timer` (runs hourly)
+        * `github-digest-serve.service`
+   - Provide `deploy/docker/` with a minimal Dockerfile (optional, but helpful)
+
+5) Implementation notes:
+   - Use `httpx` for HTTP, with timeouts and retries.
+   - Use `tenacity` (optional) for retries; if you avoid it, implement simple backoff.
+   - Add a simple throttle (sleep) between requests to avoid secondary limits.
+   - Respect GitHub API headers and show rate-limit info in logs.
+   - Keep secrets out of repo; load `.env` optionally.
+
+WORK PLAN
+- Step 1: Create file tree + config + tooling.
+- Step 2: Implement DB models + init.
+- Step 3: Implement GitHub client + fetcher and a smoke-test.
+- Step 4: Implement FastAPI endpoints + minimal HTML.
+- Step 5: Add tests, README, Makefile targets.
+- Step 6: Ensure `make dev` works.
+
+OUTPUT
+- Create all files with correct content.
+- After scaffolding, print:
+  1) the tree of created files
+  2) exact commands to run locally (venv, install, fetch, serve)
+  3) one example saved-search config file with 4 topics (llm, rag, information-retrieval, data-engineering).
+
+Start now.
