@@ -9,3 +9,6 @@ __pycache__/
 .DS_Store
 
 data/
+github_digest.db
+.a5c/node_modules/
+.a5c/.a5c/
