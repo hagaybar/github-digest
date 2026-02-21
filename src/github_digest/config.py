@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     rising_window_days: int = 7
     updated_window_days: int = 30
     rising_top_k: int = 20
-    max_summaries_per_day: int = 30
+    max_summaries_per_day: int = 100
     summary_stale_days: int = 14
     summary_star_change_threshold: int = 500
 

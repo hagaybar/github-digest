@@ -1,6 +1,32 @@
 [
-  {"name": "llm", "query": "topic:llm language:python created:>2023-01-01 stars:50..10000", "limit": 5},
-  {"name": "rag", "query": "topic:retrieval-augmented-generation created:>2023-01-01 stars:50..10000", "limit": 5},
-  {"name": "information-retrieval", "query": "topic:information-retrieval created:>2023-01-01 stars:50..10000", "limit": 5},
-  {"name": "data-engineering", "query": "topic:data-engineering created:>2023-01-01 stars:50..10000", "limit": 5}
+  {
+    "name": "llm",
+    "label": "LLM & RAG",
+    "queries": [
+      "topic:llm language:python created:>2023-01-01 stars:50..10000",
+      "topic:retrieval-augmented-generation language:python created:>2023-01-01 stars:50..10000"
+    ],
+    "limit": 5
+  },
+  {
+    "name": "information-retrieval",
+    "label": "Information Retrieval",
+    "query": "topic:information-retrieval created:>2023-01-01 stars:50..10000",
+    "limit": 5
+  },
+  {
+    "name": "data-engineering",
+    "label": "Data Engineering",
+    "query": "topic:data-engineering created:>2023-01-01 stars:50..10000",
+    "limit": 5
+  },
+  {
+    "name": "academic",
+    "label": "Academic Innovation",
+    "queries": [
+      "topic:open-science language:python created:>2023-01-01 stars:50..5000",
+      "topic:arxiv language:python created:>2023-01-01 stars:50..5000"
+    ],
+    "limit": 3
+  }
 ]

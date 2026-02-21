@@ -23,10 +23,17 @@ logger = logging.getLogger(__name__)
 class SavedSearch:
     name: str
     query: str
+    queries: list[str] = None  # type: ignore[assignment]
     limit: int | None = None
     label: str | None = None
     mode_defaults: dict[str, Any] | None = None
     exclude_known: list[str] | None = None
+
+    def all_queries(self) -> list[str]:
+        """Return all queries to run for this search."""
+        if self.queries:
+            return self.queries
+        return [self.query]
 
 
 def load_saved_searches(path: Path) -> list[SavedSearch]:
@@ -36,10 +43,14 @@ def load_saved_searches(path: Path) -> list[SavedSearch]:
     data = json.loads(path.read_text(encoding="utf-8"))
     searches: list[SavedSearch] = []
     for entry in data:
+        raw_queries = entry.get("queries")
+        # Support both "query" (single) and "queries" (list)
+        single_query = entry.get("query") or (raw_queries[0] if raw_queries else "")
         searches.append(
             SavedSearch(
                 name=entry["name"],
-                query=entry["query"],
+                query=single_query,
+                queries=raw_queries,
                 limit=entry.get("limit"),
                 label=entry.get("label"),
                 mode_defaults=entry.get("mode_defaults"),
@@ -158,18 +169,25 @@ def fetch_once(settings_obj: Settings | None = None) -> dict[str, Any]:
                     break
                 limit = search.limit or settings_obj.fetch_limit_per_query
                 limit = min(limit, settings_obj.fetch_limit_per_query)
-                remaining = settings_obj.fetch_limit_per_run - total_processed
-                per_page = min(limit, remaining)
-                logger.info("Fetching search '%s'", search.name)
-                response = client.search_repositories(search.query, per_page=per_page)
-                items: Iterable[dict[str, Any]] = response.get("items", [])
-                for item in items:
-                    repo = upsert_repo(session, item, now)
-                    upsert_repo_search(session, repo, search.name, now)
-                    upsert_repo_stats_daily(session, repo, now)
-                    total_processed += 1
+                seen_in_search: set[int] = set()
+                for query in search.all_queries():
                     if total_processed >= settings_obj.fetch_limit_per_run:
                         break
+                    remaining = settings_obj.fetch_limit_per_run - total_processed
+                    per_page = min(limit, remaining)
+                    logger.info("Fetching search '%s' (query: %s)", search.name, query[:60])
+                    response = client.search_repositories(query, per_page=per_page)
+                    items: Iterable[dict[str, Any]] = response.get("items", [])
+                    for item in items:
+                        if item["id"] in seen_in_search:
+                            continue
+                        seen_in_search.add(item["id"])
+                        repo = upsert_repo(session, item, now)
+                        upsert_repo_search(session, repo, search.name, now)
+                        upsert_repo_stats_daily(session, repo, now)
+                        total_processed += 1
+                        if total_processed >= settings_obj.fetch_limit_per_run:
+                            break
                 session.commit()
 
             run.status = "finished"
