@@ -57,6 +57,8 @@ class RepoSummary(Base):
     model: Mapped[str | None] = mapped_column(String(200), nullable=True)
     source: Mapped[str | None] = mapped_column(String(100), nullable=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    latest_release_tag: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    latest_release_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     repo: Mapped[Repo] = relationship("Repo", back_populates="summaries")
 

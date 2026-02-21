@@ -32,6 +32,8 @@ def migrate(engine: Engine) -> None:
             ("tags", "TEXT"),
             ("source", "TEXT"),
             ("updated_at", "TEXT"),
+            ("latest_release_tag", "TEXT"),
+            ("latest_release_summary", "TEXT"),
         ]:
             if not _column_exists(engine, "repo_summaries", col[0]):
                 with engine.begin() as conn:

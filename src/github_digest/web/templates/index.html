@@ -88,6 +88,16 @@
         border-radius: 999px;
         font-size: 11px;
       }
+      .sparkline {
+        display: block;
+        margin: 6px 0 2px;
+        opacity: 0.7;
+      }
+      .release {
+        font-size: 11px;
+        color: #6a5d54;
+        margin: 4px 0 2px;
+      }
     </style>
   </head>
   <body>
@@ -116,6 +126,46 @@
     <section id="board" class="board">Loading…</section>
 
     <script>
+      function buildSparkline(history, width, height) {
+        const stars = history.map((h) => h.stars);
+        const min = Math.min(...stars);
+        const max = Math.max(...stars);
+        const range = max - min || 1;
+        const n = stars.length;
+        const pad = 2;
+        const points = stars
+          .map((s, i) => {
+            const x = pad + (i / (n - 1)) * (width - pad * 2);
+            const y = pad + (1 - (s - min) / range) * (height - pad * 2);
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+          })
+          .join(" ");
+        const ns = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(ns, "svg");
+        svg.setAttribute("width", width);
+        svg.setAttribute("height", height);
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.classList.add("sparkline");
+        const pl = document.createElementNS(ns, "polyline");
+        pl.setAttribute("points", points);
+        pl.setAttribute("fill", "none");
+        pl.setAttribute("stroke", "#b8884a");
+        pl.setAttribute("stroke-width", "1.5");
+        pl.setAttribute("stroke-linejoin", "round");
+        pl.setAttribute("stroke-linecap", "round");
+        svg.appendChild(pl);
+        // Dot at the last point
+        const lastX = pad + (width - pad * 2);
+        const lastY = pad + (1 - (stars[n - 1] - min) / range) * (height - pad * 2);
+        const circle = document.createElementNS(ns, "circle");
+        circle.setAttribute("cx", lastX.toFixed(1));
+        circle.setAttribute("cy", lastY.toFixed(1));
+        circle.setAttribute("r", "2.5");
+        circle.setAttribute("fill", "#b8884a");
+        svg.appendChild(circle);
+        return svg;
+      }
+
       async function loadBoard() {
         const mode = document.getElementById("mode").value;
         const timeframe = document.getElementById("timeframe").value;
@@ -142,9 +192,18 @@
               row.innerHTML = `<a href="${repo.html_url}" target="_blank">${repo.full_name}</a>`;
               const meta = document.createElement("div");
               meta.className = "meta";
-              const delta = repo.delta !== null && repo.delta !== undefined ? ` · +${repo.delta}` : "";
-              meta.textContent = `⭐ ${repo.stars} · ${repo.language || "n/a"}${delta}`;
+              const delta = repo.delta !== null && repo.delta !== undefined ? ` · +${repo.delta} ★` : "";
+              const forks = repo.forks ? ` · 🍴 ${repo.forks.toLocaleString()}` : "";
+              const pushedAge = repo.pushed_at ? (() => {
+                const days = Math.floor((Date.now() - new Date(repo.pushed_at)) / 86400000);
+                return days === 0 ? " · pushed today" : days === 1 ? " · pushed yesterday" : ` · pushed ${days}d ago`;
+              })() : "";
+              meta.textContent = `⭐ ${repo.stars.toLocaleString()} · ${repo.language || "n/a"}${forks}${delta}${pushedAge}`;
               row.appendChild(meta);
+
+              if (repo.star_history && repo.star_history.length >= 2) {
+                row.appendChild(buildSparkline(repo.star_history, 100, 22));
+              }
 
               if (repo.summary) {
                 const summary = document.createElement("div");
@@ -152,10 +211,20 @@
                 summary.textContent = repo.summary;
                 row.appendChild(summary);
 
-                const why = document.createElement("div");
-                why.className = "summary";
-                why.textContent = repo.why_interesting;
-                row.appendChild(why);
+                if (repo.why_interesting) {
+                  const why = document.createElement("div");
+                  why.className = "summary";
+                  why.textContent = repo.why_interesting;
+                  row.appendChild(why);
+                }
+
+                if (repo.latest_release_tag) {
+                  const rel = document.createElement("div");
+                  rel.className = "release";
+                  rel.textContent = `📦 ${repo.latest_release_tag}` +
+                    (repo.latest_release_summary ? ` · ${repo.latest_release_summary}` : "");
+                  row.appendChild(rel);
+                }
 
                 if (repo.tags && repo.tags.length) {
                   const tags = document.createElement("div");

@@ -1,6 +1,6 @@
 [
-  {"name": "llm", "query": "topic:llm language:python", "limit": 10},
-  {"name": "rag", "query": "topic:retrieval-augmented-generation", "limit": 10},
-  {"name": "information-retrieval", "query": "topic:information-retrieval", "limit": 10},
-  {"name": "data-engineering", "query": "topic:data-engineering", "limit": 10}
+  {"name": "llm", "query": "topic:llm language:python", "limit": 5},
+  {"name": "rag", "query": "topic:retrieval-augmented-generation", "limit": 5},
+  {"name": "information-retrieval", "query": "topic:information-retrieval", "limit": 5},
+  {"name": "data-engineering", "query": "topic:data-engineering", "limit": 5}
 ]

@@ -1,8 +1,8 @@
 [Unit]
-Description=Run GitHub Digest fetch every 2 hours
+Description=Run GitHub Digest fetch once daily
 
 [Timer]
-OnCalendar=*-*-* 00/2:00:00
+OnCalendar=*-*-* 08:00:00
 Persistent=true
 
 [Install]

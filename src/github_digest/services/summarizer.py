@@ -262,6 +262,10 @@ def summarize_repos(
                 summary.model = payload["model"]
                 summary.source = payload["source"]
                 summary.updated_at = datetime.now(timezone.utc)
+                if "latest_release_tag" in payload:
+                    summary.latest_release_tag = payload["latest_release_tag"]
+                if "latest_release_summary" in payload:
+                    summary.latest_release_summary = payload["latest_release_summary"]
                 session.add(summary)
                 session.commit()
                 summarized += 1

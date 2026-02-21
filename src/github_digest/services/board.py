@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from collections import defaultdict
+from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Iterable
 
@@ -18,6 +19,7 @@ class BoardItem:
     search: RepoSearch
     delta: int | None = None
     summary: RepoSummary | None = None
+    star_history: list[dict[str, Any]] = field(default_factory=list)
 
 
 def _today_utc() -> date:
@@ -52,6 +54,9 @@ def _repo_to_dict(item: BoardItem) -> dict[str, Any]:
         "summary": summary.summary if summary else None,
         "why_interesting": summary.why_interesting if summary else None,
         "tags": json.loads(summary.tags) if summary and summary.tags else [],
+        "latest_release_tag": summary.latest_release_tag if summary else None,
+        "latest_release_summary": summary.latest_release_summary if summary else None,
+        "star_history": item.star_history,
     }
 
 
@@ -116,6 +121,27 @@ def get_board_for_query(
         )
     else:
         items = _board_new(session, search, effective_window, limit, include_summary=include_summary)
+
+    # Batch-load last 8 days of star history for all repos in this result
+    if items:
+        repo_ids = [item.repo.id for item in items]
+        history_cutoff = (_today_utc() - timedelta(days=8)).isoformat()
+        stats_rows = (
+            session.execute(
+                select(RepoStatsDaily)
+                .where(RepoStatsDaily.repo_id.in_(repo_ids))
+                .where(RepoStatsDaily.date >= history_cutoff)
+                .order_by(RepoStatsDaily.date)
+            )
+            .scalars()
+            .all()
+        )
+        history_map: dict[int, list[dict[str, Any]]] = defaultdict(list)
+        for stat in stats_rows:
+            history_map[stat.repo_id].append({"date": stat.date, "stars": stat.stars})
+        for item in items:
+            item.star_history = history_map.get(item.repo.id, [])
+
     return [_repo_to_dict(item) for item in items]
 
 

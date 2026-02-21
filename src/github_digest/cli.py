@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 
 import uvicorn
@@ -11,6 +12,7 @@ from github_digest.config import settings
 from github_digest.db.database import create_tables, get_engine
 from github_digest.db.models import Repo, Run
 from github_digest.services.fetcher import fetch_once
+from github_digest.services.llm_summarizer import make_llm_model_fn
 from github_digest.services.summarizer import summarize_repos
 
 
@@ -40,6 +42,23 @@ def cmd_summarize(args: argparse.Namespace) -> None:
         dry_run=args.dry_run,
     )
     logger.info("Summarize result: %s", result)
+
+
+def cmd_summarize_llm(args: argparse.Namespace) -> None:
+    llm_fn = make_llm_model_fn(
+        github_token=settings.github_token,
+        ollama_model=args.model,
+        ollama_base_url=args.ollama_url,
+    )
+    result = summarize_repos(
+        settings,
+        limit=args.limit,
+        force=args.force,
+        dry_run=args.dry_run,
+        model_fn=llm_fn,
+        today_only=False,
+    )
+    print(json.dumps(result, indent=2))
 
 
 def cmd_serve() -> None:
@@ -112,6 +131,35 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Logging level (e.g., INFO, DEBUG)",
     )
+    summarize_llm = sub.add_parser("summarize-llm", help="Summarize repos using a local Ollama LLM and README content")
+    summarize_llm.add_argument(
+        "--limit",
+        type=int,
+        default=15,
+        help="Cap this summarize-llm run (default: 15)",
+    )
+    summarize_llm.add_argument(
+        "--model",
+        type=str,
+        default="llama3.2",
+        help="Ollama model name (default: llama3.2)",
+    )
+    summarize_llm.add_argument(
+        "--ollama-url",
+        type=str,
+        default="http://localhost:11434",
+        help="Ollama base URL (default: http://localhost:11434)",
+    )
+    summarize_llm.add_argument(
+        "--force",
+        action="store_true",
+        help="Ignore idempotency checks (still capped)",
+    )
+    summarize_llm.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="No DB writes; show planned repo count and names",
+    )
     sub.add_parser("serve", help="Run API server")
     sub.add_parser("health", help="Print health info")
     return parser
@@ -125,6 +173,8 @@ def main() -> None:
         cmd_fetch()
     elif args.command == "summarize":
         cmd_summarize(args)
+    elif args.command == "summarize-llm":
+        cmd_summarize_llm(args)
     elif args.command == "serve":
         cmd_serve()
     elif args.command == "health":
