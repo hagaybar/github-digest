@@ -1,0 +1,716 @@
+Builder Radar Pivot Requirements (Phases 1–6)
+0. Mission Summary
+
+Transform the existing “GitHub digest” app into a Builder Radar: a daily feed that surfaces cool new tools and actionable build ideas using cross-platform signals (starting with GitHub + Hacker News), while preserving current functionality by developing on a new branch.
+
+Core outputs:
+
+Today’s 7 Cool Things (cards)
+
+Build With This (pairings derived from those cards)
+
+Primary design change:
+
+Replace “summarize README” with a curation pipeline: ingest → normalize → fuse signals → rank → LLM structured analysis → UI cards.
+
+Non-goals (for this pivot slice):
+
+Perfect personalization
+
+Full Reddit ingestion (planned later)
+
+Heavy UI redesign
+
+Multi-tenant auth
+
+Paid features
+
+1. Branching & Safety Rules
+1.1 Branch policy
+
+Create a new branch from current default branch (e.g., main):
+
+Branch name: pivot/builder-radar-v1
+
+All work for phases 1–6 must occur on this branch only.
+
+Do not break current production paths. If needed, introduce feature flags / separate routes.
+
+1.2 Backward compatibility
+
+Existing GitHub ingestion + digest views must remain functional (unless already broken).
+
+New functionality should be additive:
+
+new tables
+
+new routes
+
+new scheduled jobs
+
+new UI page(s)
+
+1.3 Operational constraints (OCI Ampere A1 / ARM64)
+
+All dependencies must be compatible with aarch64.
+
+Avoid heavy native builds unless required (prefer pure-Python / prebuilt wheels).
+
+Keep SQLite as baseline persistence for MVP.
+
+Add logging to confirm ingestion runs + ranking outputs.
+
+2. Deliverables
+2.1 Documents
+
+PRODUCT.md (1 page; crisp)
+
+schemas/item_v1.json OR schemas/item_v1.md (canonical schema)
+
+REQUIREMENTS_PIVOT_BUILDER_RADAR.md (this document can be the single spec; optionally split)
+
+2.2 Code
+
+New ingestion: Hacker News (HN)
+
+Normalization/fusion layer to produce canonical ItemV1
+
+Ranking layer selecting top N daily items
+
+LLM analysis layer to generate card fields
+
+Pairing layer for “Build With This”
+
+Minimal UI surfaces:
+
+/today (or equivalent) showing Today’s 7
+
+/build (or equivalent) showing pairings
+
+2.3 Data
+
+SQLite schema migrations (or SQL scripts)
+
+Storage of:
+
+raw HN stories (or minimal raw fields)
+
+canonical items
+
+analysis results
+
+daily selections
+
+3. Phase 1: Product Contract (Spec + UX Contract)
+3.1 Create PRODUCT.md
+
+Must include:
+
+A) Primary user story (A + D)
+
+“As a builder, I want to discover cool new tools and get concrete project ideas so I can build/learn faster.”
+
+B) Daily UX
+
+Today page: 7 cards
+
+Build page: pairings
+
+C) Input sources (v1)
+
+GitHub (existing)
+
+Hacker News (new)
+
+(Reddit/RSS are explicitly “vNext”; mention but don’t implement)
+
+D) Output contract
+
+Every surfaced unit must be represented as a canonical ItemV1 record, stored in DB, and rendered by UI.
+
+Acceptance
+
+PRODUCT.md exists and reflects the pivot clearly.
+
+It does not include implementation details beyond the minimal contract and outputs.
+
+4. Phase 2: Canonical Schema (Single Source of Truth)
+4.1 Create schema definition ItemV1
+
+Represent every discovered candidate (repo/link/story) uniformly.
+
+Implement as ONE of:
+
+JSON Schema file: schemas/item_v1.json
+
+Or a typed model in code (Pydantic/dataclass) plus documentation: schemas/item_v1.md
+
+4.1.1 Required fields (minimum)
+
+id (stable string; deterministic hash OK)
+
+source (enum: github, hackernews, reddit, rss, other)
+
+source_id (e.g., HN story id, GitHub repo full_name)
+
+url
+
+title
+
+published_at (ISO 8601)
+
+collected_at (ISO 8601)
+
+4.1.2 Optional association fields
+
+github_repo (object or null)
+
+full_name (e.g., owner/repo)
+
+html_url
+
+description
+
+language
+
+stars
+
+forks
+
+open_issues
+
+pushed_at
+
+created_at
+
+content (object)
+
+summary_source_text (short excerpt, not full page copy)
+
+readme_excerpt (if available, capped length)
+
+tags_detected (list)
+
+4.1.3 Signals (for fusion)
+
+signals object (numbers default null):
+
+github_stars_total
+
+github_stars_7d (if available)
+
+github_velocity (computed: e.g., stars/day over window)
+
+hn_points
+
+hn_comments
+
+hn_rank (if pulling front-page order)
+
+reddit_score (vNext)
+
+rss_mentions (vNext)
+
+4.1.4 Derived classification (non-LLM or LLM)
+
+tags object:
+
+domains (list: e.g., agents, devtools, infra, data, web, security)
+
+languages (list)
+
+maturity (experimental|beta|stable|unknown)
+
+composable (low|medium|high|unknown)
+
+4.1.5 LLM Analysis (card fields)
+
+analysis object:
+
+unlock (1 sentence)
+
+novelty (1 sentence)
+
+why_cool (2–4 bullets)
+
+best_start (a pointer: file path / README section / demo link)
+
+build_ideas (exactly 3 items)
+
+each: {size: small|medium|spicy, idea: string, steps?: [string], prerequisites?: [string]}
+
+confidence (0.0–1.0)
+
+4.1.6 Ranking & selection metadata
+
+scores object:
+
+cool_score
+
+buildability_score
+
+momentum_score
+
+final_score
+
+score_version
+
+daily_pick object:
+
+picked_for_date (YYYY-MM-DD or null)
+
+picked_rank (1..7)
+
+pairing object (optional):
+
+paired_with_ids (list)
+
+pairing_rationale (short string)
+
+Acceptance
+
+A canonical schema exists.
+
+A unit test (or validation script) confirms produced items conform.
+
+5. Phase 3: Add Hacker News Ingestion (First New Source)
+5.1 Goal
+
+Ingest HN stories daily (or hourly) and convert them into ItemV1 candidates; extract GitHub links where possible.
+
+5.2 Data acquisition (HN)
+
+Use HN public endpoints (simple JSON). Implement a fetcher that:
+
+Pulls top stories + new stories (choose one; top is enough for v1)
+
+For each story:
+
+id, title, url, score, descendants, time, by
+
+Convert time to ISO 8601 UTC
+
+Store raw minimal story in DB table hn_story_raw (or JSON column)
+
+5.3 GitHub link extraction
+
+For each HN story URL:
+
+If URL is GitHub repo:
+
+parse owner/repo
+
+set github_repo.full_name
+
+If URL is not GitHub but contains GitHub link(s) in comments:
+
+v1 can skip comment crawling; implement only direct URL parsing initially
+
+5.4 Output
+
+For each story, create or upsert an ItemV1 record:
+
+source=hackernews
+
+source_id=<hn_id>
+
+signals.hn_points, signals.hn_comments
+
+If GitHub repo parsed, populate github_repo.full_name
+
+5.5 Scheduling
+
+Add a cron/systemd timer (or existing scheduler) to run:
+
+ingest_hn every 1–3 hours
+
+Acceptance
+
+Running the job produces ItemV1 rows sourced from HN.
+
+At least some HN items link to GitHub repos and get github_repo.full_name populated.
+
+Job is idempotent (re-running doesn’t duplicate).
+
+6. Phase 4: Fusion + Ranking Layer (Before More LLM)
+6.1 Goal
+
+Compute a daily candidate list and rank items to choose top N for analysis.
+
+6.2 Deduplication rules
+
+Deduplicate by preference order:
+
+Same github_repo.full_name (if present)
+
+Else same normalized URL (strip tracking params)
+
+Else same source + source_id
+
+When duplicates exist, merge signals:
+
+Max HN points/comments across records
+
+Prefer GitHub metadata if present
+
+Keep provenance: store related_item_ids (optional) or link table
+
+6.3 Scoring v1 (simple, explainable)
+
+Implement score_version = "v1".
+
+Suggested scoring (agent may adjust, but must be deterministic):
+
+momentum_score:
+
+normalize HN points (log scale)
+
+normalize GitHub velocity if available
+
+cool_score:
+
+presence of demo/badges/examples (light heuristics) OR placeholder=0.5 until LLM enriches
+
+buildability_score:
+
+docs presence heuristic (README length > threshold, has “Install”, has “Quickstart”, etc.)
+
+language known (not empty)
+
+final_score = weighted sum. Must be configurable in a config file.
+
+6.4 Candidate selection
+
+Define daily window: last 24 hours (or last 48) by published_at or collected_at.
+
+Rank and select:
+
+top_k_for_llm = 30/day (configurable)
+
+top_7_for_today = 7/day
+
+Persist selections:
+
+Create daily_picks table keyed by date, referencing item ids + rank.
+
+Acceptance
+
+A CLI or job produces a ranked list.
+
+DB stores daily picks for a given date.
+
+Re-running for same date is deterministic (unless new data entered).
+
+7. Phase 5: LLM Card Generator (Replace “Summary”)
+7.1 Goal
+
+Generate structured analysis fields for selected items (top 30/day), with strict parsing and failure handling.
+
+7.2 Inputs to LLM
+
+For each selected item, compile a context bundle:
+
+title, url
+
+if GitHub repo:
+
+description, language, stars, recent activity
+
+README excerpt (cap length)
+
+(optional) release notes excerpt (cap)
+
+HN signals: points/comments
+
+Any extracted “hooks” heuristic (keywords like “benchmark”, “docker”, “cli”, “agent”, “self-host”)
+
+7.3 Output requirements
+
+LLM must output valid JSON conforming to:
+
+analysis object in schema
+
+Exactly 3 build ideas with sizes: small, medium, spicy
+
+7.4 Prompt rules
+
+No marketing fluff.
+
+Must be concrete and testable.
+
+best_start must be a real pointer (README section or file path). If unknown, set "best_start": "README: Quickstart" and reduce confidence.
+
+7.5 Validation + fallbacks
+
+Parse JSON strictly.
+
+If invalid:
+
+retry once with “fix JSON only” prompt
+
+If still invalid:
+
+store analysis as null + record error in logs
+
+item can still appear but marked “analysis unavailable” OR excluded from top 7
+
+7.6 Storage
+
+Persist the analysis into:
+
+item_analysis table keyed by item_id and analysis_version="v1"
+OR as columns in items table if already present.
+
+Acceptance
+
+For at least 80% of top_k_for_llm items, analysis is generated and stored.
+
+UI can render card fields from stored analysis.
+
+8. Phase 6: Pairing + Minimal UI Surfaces
+8.1 Pairing engine v1 (heuristic)
+
+Goal: generate 5–15 pairings daily based on Today’s 7 (or top 30).
+
+Heuristic pairing:
+
+Pair items with complementary tags:
+
+“crawler” + “db/index”
+
+“model runtime” + “ui”
+
+“agent framework” + “eval harness”
+
+Avoid pairing two near-identical tools (same domain + same language + same keywords)
+
+Produce a short rationale string:
+
+“Combine X (data collection) + Y (UI) to build Z”
+
+Persist pairings:
+
+daily_pairings table keyed by date with:
+
+item_id_a, item_id_b, rationale, rank
+
+8.2 UI Requirements (minimal changes)
+
+Add two routes/pages:
+
+8.2.1 Today page (/today)
+
+Displays 7 cards for current date:
+
+Title (link)
+
+Unlock (1 sentence)
+
+Novelty (1 sentence)
+
+Why cool (bullets)
+
+Best start
+
+Build ideas (small/medium/spicy)
+
+Signals (HN points, GitHub stars if available)
+
+Must gracefully handle missing analysis:
+
+show title + link + signals + “analysis pending”
+
+8.2.2 Build page (/build)
+
+Displays pairings:
+
+Pair title: “X + Y”
+
+Rationale
+
+Each item shows its unlock + best start
+
+8.3 API endpoints (if frontend uses API)
+
+Expose:
+
+GET /api/today?date=YYYY-MM-DD
+
+GET /api/build?date=YYYY-MM-DD
+
+Acceptance
+
+Visiting /today shows 7 items for the current date.
+
+Visiting /build shows pairings for the same date.
+
+Both pages load quickly and do not require re-running LLM live.
+
+9. Data Model (SQLite)
+9.1 Required tables (suggested)
+
+Agent can adapt to current schema but must support these concepts:
+
+hn_story_raw:
+
+hn_id (PK)
+
+title, url, by, score, comments, time, raw_json, collected_at
+
+items (canonical ItemV1 core):
+
+id (PK)
+
+source, source_id, url, title
+
+published_at, collected_at
+
+github_full_name (nullable)
+
+signals_json (or columns)
+
+tags_json (optional)
+
+scores_json
+
+indexes on github_full_name, url, published_at
+
+item_analysis:
+
+item_id (FK)
+
+analysis_version
+
+analysis_json
+
+created_at
+
+daily_picks:
+
+date + rank (composite PK) OR date + item_id
+
+item_id, rank, created_at
+
+daily_pairings:
+
+date + rank
+
+item_id_a, item_id_b, rationale, created_at
+
+Acceptance
+
+Migrations exist and can be applied from scratch.
+
+10. CLI / Jobs
+10.1 Commands to implement (or equivalents)
+
+ingest_github (existing; keep)
+
+ingest_hn (new)
+
+build_candidates (dedupe + fuse)
+
+rank_daily (writes daily picks)
+
+analyze_daily (LLM analysis for top_k_for_llm)
+
+pair_daily (writes pairings)
+
+10.2 Orchestrator script
+
+Add run_daily_pipeline.sh (or python) that runs:
+
+ingest GitHub
+
+ingest HN
+
+build candidates
+
+rank daily (top 7 + top 30)
+
+analyze daily
+
+pair daily
+
+Cron/systemd triggers this at least daily; ingestion can also be more frequent.
+
+Acceptance
+
+One command runs the full pipeline for today without manual steps.
+
+11. Observability & Logging
+
+Must log:
+
+number of items ingested per source
+
+number of candidates after dedupe
+
+top 10 ranked item titles + scores (debug)
+
+number analyzed successfully
+
+number of pairings created
+
+Store logs in the existing logging approach (match current conventions).
+
+Acceptance:
+
+Logs make it obvious where failures occur (network vs parse vs DB vs LLM).
+
+12. Testing Requirements (MVP-level but real)
+12.1 Unit tests
+
+URL normalization + dedupe logic
+
+GitHub repo parsing from URL
+
+Schema validation of ItemV1 object
+
+12.2 Integration test (offline)
+
+Use recorded fixtures (HN JSON sample + GitHub sample) to run pipeline without network.
+
+Acceptance:
+
+Tests pass in CI/local.
+
+13. Definition of Done (Phases 1–6)
+
+The pivot is considered complete when:
+
+A new branch pivot/builder-radar-v1 exists with all changes.
+
+PRODUCT.md + schema exists.
+
+HN ingestion runs and produces ItemV1 records.
+
+Ranking selects daily top 7 and persists them.
+
+LLM analysis produces card fields for selected items with strict JSON parsing.
+
+Pairings exist for the day.
+
+UI pages /today and /build render from persisted DB data.
+
+Existing app functionality is not broken.
+
+14. Implementation Notes (Guidance to the Agent)
+
+Prefer deterministic IDs:
+
+id = sha1(source + ":" + source_id) OR sha1(normalized_url) with collision-safe strategy.
+
+Keep LLM calls behind a --enable-llm flag to allow pipeline runs without it.
+
+Use configuration file config.yaml for:
+
+scoring weights
+
+top_k_for_llm
+
+daily picks count
+
+ingestion intervals
+
+Don’t add Reddit yet in code; just structure so it can be added.

@@ -1,0 +1,32 @@
+[
+  {
+    "id": 12345,
+    "title": "Show HN: My new open-source crawler written in Python",
+    "url": "https://github.com/testuser/testcrawler",
+    "by": "testuser",
+    "score": 150,
+    "descendants": 45,
+    "time": 1708521600,
+    "type": "story"
+  },
+  {
+    "id": 12346,
+    "title": "Ask HN: What tools are you using for LLM evaluation?",
+    "url": null,
+    "by": "anotheruser",
+    "score": 89,
+    "descendants": 120,
+    "time": 1708521700,
+    "type": "story"
+  },
+  {
+    "id": 12347,
+    "title": "New database indexing tool for developers",
+    "url": "https://example.com/db-tool",
+    "by": "dbuser",
+    "score": 42,
+    "descendants": 15,
+    "time": 1708521800,
+    "type": "story"
+  }
+]

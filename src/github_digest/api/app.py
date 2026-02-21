@@ -9,12 +9,12 @@ import xml.etree.ElementTree as ET
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from github_digest.config import settings
 from github_digest.db.database import create_tables, get_engine, get_session
-from github_digest.db.models import Repo, Run
+from github_digest.db.models import DailyPairing, DailyPick, RadarItem, RadarItemAnalysis, Repo, Run
 from github_digest.services.board import get_board_for_query, get_board_today
 from github_digest.services.fetcher import load_saved_searches
 
@@ -160,6 +160,140 @@ def atom_feed(db: Session = Depends(get_session)) -> Response:
 
     xml_str = '<?xml version="1.0" encoding="utf-8"?>\n' + ET.tostring(feed_el, encoding="unicode")
     return Response(content=xml_str, media_type="application/atom+xml; charset=utf-8")
+
+
+def _get_today_items(db: Session, date_str: str) -> list[dict]:
+    """Query daily picks with their analysis for a given date."""
+    rows = db.execute(
+        text("""
+            SELECT ri.id, ri.source, ri.url, ri.title, ri.github_full_name,
+                   ri.signals_json, ri.scores_json, ria.analysis_json,
+                   dp.rank
+            FROM daily_picks dp
+            JOIN radar_items ri ON dp.item_id = ri.id
+            LEFT JOIN radar_item_analysis ria ON ria.item_id = ri.id AND ria.analysis_version = 'v1'
+            WHERE dp.date = :date
+            ORDER BY dp.rank ASC
+        """),
+        {"date": date_str},
+    ).fetchall()
+
+    import json
+    items = []
+    for row in rows:
+        signals = row[5]
+        if isinstance(signals, str):
+            try:
+                signals = json.loads(signals)
+            except Exception:
+                signals = {}
+        signals = signals or {}
+
+        analysis = row[7]
+        if isinstance(analysis, str):
+            try:
+                analysis = json.loads(analysis)
+            except Exception:
+                analysis = None
+
+        items.append({
+            "id": row[0],
+            "source": row[1],
+            "url": row[2],
+            "title": row[3],
+            "github_full_name": row[4],
+            "signals": signals,
+            "analysis": analysis,
+            "rank": row[8],
+        })
+    return items
+
+
+def _get_build_pairings(db: Session, date_str: str) -> list[dict]:
+    """Query daily pairings with item data for a given date."""
+    import json
+    rows = db.execute(
+        text("""
+            SELECT dp.rank, dp.rationale,
+                   a.id, a.source, a.url, a.title, a.github_full_name, a.signals_json,
+                   b.id, b.source, b.url, b.title, b.github_full_name, b.signals_json,
+                   ana.analysis_json, anb.analysis_json
+            FROM daily_pairings dp
+            JOIN radar_items a ON dp.item_id_a = a.id
+            JOIN radar_items b ON dp.item_id_b = b.id
+            LEFT JOIN radar_item_analysis ana ON ana.item_id = a.id AND ana.analysis_version = 'v1'
+            LEFT JOIN radar_item_analysis anb ON anb.item_id = b.id AND anb.analysis_version = 'v1'
+            WHERE dp.date = :date
+            ORDER BY dp.rank ASC
+        """),
+        {"date": date_str},
+    ).fetchall()
+
+    pairings = []
+    for row in rows:
+        def parse_json(val):
+            if isinstance(val, str):
+                try:
+                    return json.loads(val)
+                except Exception:
+                    return None
+            return val
+
+        pairings.append({
+            "rank": row[0],
+            "rationale": row[1],
+            "item_a": {
+                "id": row[2], "source": row[3], "url": row[4],
+                "title": row[5], "github_full_name": row[6],
+                "signals": parse_json(row[7]) or {},
+                "analysis": parse_json(row[14]),
+            },
+            "item_b": {
+                "id": row[8], "source": row[9], "url": row[10],
+                "title": row[11], "github_full_name": row[12],
+                "signals": parse_json(row[13]) or {},
+                "analysis": parse_json(row[15]),
+            },
+        })
+    return pairings
+
+
+@app.get("/api/today")
+def api_today(
+    date: str | None = None,
+    db: Session = Depends(get_session),
+) -> dict[str, Any]:
+    from datetime import datetime, timezone
+    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    items = _get_today_items(db, date_str)
+    return {"date": date_str, "items": items}
+
+
+@app.get("/api/build")
+def api_build(
+    date: str | None = None,
+    db: Session = Depends(get_session),
+) -> dict[str, Any]:
+    from datetime import datetime, timezone
+    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    pairings = _get_build_pairings(db, date_str)
+    return {"date": date_str, "pairings": pairings}
+
+
+@app.get("/today", response_class=HTMLResponse)
+def today_page(request: Request, date: str | None = None, db: Session = Depends(get_session)) -> HTMLResponse:
+    from datetime import datetime, timezone
+    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    items = _get_today_items(db, date_str)
+    return templates.TemplateResponse("today.html", {"request": request, "items": items, "date": date_str})
+
+
+@app.get("/build", response_class=HTMLResponse)
+def build_page(request: Request, date: str | None = None, db: Session = Depends(get_session)) -> HTMLResponse:
+    from datetime import datetime, timezone
+    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    pairings = _get_build_pairings(db, date_str)
+    return templates.TemplateResponse("build.html", {"request": request, "pairings": pairings, "date": date_str})
 
 
 @app.get("/", response_class=HTMLResponse)

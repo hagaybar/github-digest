@@ -78,3 +78,145 @@ def migrate(engine: Engine) -> None:
                 """
             )
         )
+
+    # ---------------------------------------------------------------------------
+    # Builder Radar tables
+    # ---------------------------------------------------------------------------
+
+    # hn_story_raw
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS hn_story_raw (
+                  hn_id TEXT PRIMARY KEY,
+                  title TEXT NOT NULL,
+                  url TEXT,
+                  by TEXT,
+                  score INTEGER,
+                  comments INTEGER,
+                  time INTEGER NOT NULL,
+                  raw_json TEXT,
+                  collected_at TEXT NOT NULL DEFAULT (datetime('now'))
+                )
+                """
+            )
+        )
+
+    # radar_items
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS radar_items (
+                  id TEXT PRIMARY KEY,
+                  source TEXT NOT NULL,
+                  source_id TEXT NOT NULL,
+                  url TEXT NOT NULL,
+                  title TEXT NOT NULL,
+                  published_at TEXT,
+                  collected_at TEXT NOT NULL DEFAULT (datetime('now')),
+                  github_full_name TEXT,
+                  signals_json TEXT,
+                  tags_json TEXT,
+                  scores_json TEXT
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS uq_radar_items_source_source_id "
+                "ON radar_items(source, source_id)"
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE INDEX IF NOT EXISTS ix_radar_items_github_full_name "
+                "ON radar_items(github_full_name)"
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE INDEX IF NOT EXISTS ix_radar_items_url "
+                "ON radar_items(url)"
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE INDEX IF NOT EXISTS ix_radar_items_published_at "
+                "ON radar_items(published_at)"
+            )
+        )
+
+    # radar_item_analysis
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS radar_item_analysis (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  item_id TEXT NOT NULL,
+                  analysis_version TEXT NOT NULL DEFAULT 'v1',
+                  analysis_json TEXT,
+                  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                  FOREIGN KEY (item_id) REFERENCES radar_items(id)
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS uq_analysis_item_version "
+                "ON radar_item_analysis(item_id, analysis_version)"
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE INDEX IF NOT EXISTS ix_radar_item_analysis_item_id "
+                "ON radar_item_analysis(item_id)"
+            )
+        )
+
+    # daily_picks
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS daily_picks (
+                  date TEXT NOT NULL,
+                  rank INTEGER NOT NULL,
+                  item_id TEXT NOT NULL,
+                  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                  PRIMARY KEY (date, rank),
+                  FOREIGN KEY (item_id) REFERENCES radar_items(id)
+                )
+                """
+            )
+        )
+
+    # daily_pairings
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS daily_pairings (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  date TEXT NOT NULL,
+                  rank INTEGER NOT NULL,
+                  item_id_a TEXT NOT NULL,
+                  item_id_b TEXT NOT NULL,
+                  rationale TEXT,
+                  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                  FOREIGN KEY (item_id_a) REFERENCES radar_items(id),
+                  FOREIGN KEY (item_id_b) REFERENCES radar_items(id)
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE INDEX IF NOT EXISTS ix_daily_pairings_date "
+                "ON daily_pairings(date)"
+            )
+        )

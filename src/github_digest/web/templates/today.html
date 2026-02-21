@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Builder Radar — Today</title>
+  <style>
+    :root { color-scheme: light; font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif; background: #f7f4ef; color: #2a2a2a; }
+    body { margin: 0; padding: 24px; }
+    nav { margin-bottom: 20px; }
+    nav a { color: #6a5d54; text-decoration: none; margin-right: 16px; font-size: 14px; }
+    nav a:hover { text-decoration: underline; }
+    h1 { margin: 0 0 4px; font-size: 28px; }
+    .subtitle { color: #6a5d54; margin: 0 0 24px; font-size: 14px; }
+    .cards { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+    .card { background: #fffaf3; border: 1px solid #eadfcd; border-radius: 12px; padding: 20px; }
+    .card h2 { margin: 0 0 8px; font-size: 18px; }
+    .card h2 a { color: #2a2a2a; text-decoration: none; }
+    .card h2 a:hover { text-decoration: underline; }
+    .source-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #eadfcd; color: #6a5d54; margin-bottom: 10px; }
+    .unlock { font-style: italic; color: #4a3f36; margin: 8px 0; font-size: 14px; }
+    .novelty { color: #6a5d54; font-size: 13px; margin: 4px 0 8px; }
+    .why-cool { list-style: none; padding: 0; margin: 8px 0; }
+    .why-cool li::before { content: "-> "; color: #a08060; }
+    .why-cool li { font-size: 13px; margin-bottom: 4px; }
+    .best-start { font-size: 12px; color: #6a5d54; margin: 8px 0; }
+    .best-start strong { color: #4a3f36; }
+    .build-ideas h4 { margin: 12px 0 6px; font-size: 13px; color: #4a3f36; }
+    .idea { margin-bottom: 8px; }
+    .idea-size { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 4px; margin-right: 6px; font-weight: bold; }
+    .size-small { background: #d4edda; color: #155724; }
+    .size-medium { background: #fff3cd; color: #856404; }
+    .size-spicy { background: #f8d7da; color: #721c24; }
+    .idea-text { font-size: 13px; }
+    .signals { margin-top: 10px; font-size: 12px; color: #6a5d54; }
+    .pending { color: #a08060; font-style: italic; font-size: 14px; padding: 16px 0; }
+    .empty { color: #6a5d54; text-align: center; padding: 48px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">&#8592; GitHub Digest</a>
+    <a href="/today"><strong>Today's 7</strong></a>
+    <a href="/build">Build With This &#8594;</a>
+  </nav>
+  <h1>Builder Radar</h1>
+  <p class="subtitle">Today's 7 cool things &middot; {{ date }}</p>
+
+  {% if items %}
+  <div class="cards">
+    {% for item in items %}
+    <div class="card">
+      <span class="source-badge">{{ item.source }}</span>
+      <h2><a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a></h2>
+
+      {% if item.analysis %}
+        {% if item.analysis.unlock %}
+        <p class="unlock">{{ item.analysis.unlock }}</p>
+        {% endif %}
+        {% if item.analysis.novelty %}
+        <p class="novelty">{{ item.analysis.novelty }}</p>
+        {% endif %}
+        {% if item.analysis.why_cool %}
+        <ul class="why-cool">
+          {% for bullet in item.analysis.why_cool %}
+          <li>{{ bullet }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if item.analysis.best_start %}
+        <p class="best-start"><strong>Start here:</strong> {{ item.analysis.best_start }}</p>
+        {% endif %}
+        {% if item.analysis.build_ideas %}
+        <div class="build-ideas">
+          <h4>Build with this:</h4>
+          {% for idea in item.analysis.build_ideas %}
+          <div class="idea">
+            <span class="idea-size size-{{ idea.size }}">{{ idea.size }}</span>
+            <span class="idea-text">{{ idea.idea }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% else %}
+        <p class="pending">Analysis pending — check back soon.</p>
+      {% endif %}
+
+      <div class="signals">
+        {% if item.signals.hn_points %}&#11014; {{ item.signals.hn_points }} HN pts{% endif %}
+        {% if item.signals.github_stars_total %} &middot; &#11088; {{ item.signals.github_stars_total }}{% endif %}
+        {% if item.github_full_name %} &middot; <a href="https://github.com/{{ item.github_full_name }}" target="_blank">{{ item.github_full_name }}</a>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">No picks for today yet. Run the pipeline to populate.</div>
+  {% endif %}
+</body>
+</html>
