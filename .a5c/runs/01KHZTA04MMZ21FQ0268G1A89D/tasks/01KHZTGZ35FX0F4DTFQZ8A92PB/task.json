@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHZTGZ35FX0F4DTFQZ8A92PB",
+  "taskId": "run-llm-summarizer",
+  "invocationKey": "github-digest/readme-llm-summaries:S000003:run-llm-summarizer",
+  "stepId": "S000003",
+  "kind": "agent",
+  "title": "Run LLM summarizer for up to 15 repos",
+  "io": {
+    "inputJsonPath": "tasks/run-llm-summarizer/input.json",
+    "outputJsonPath": "tasks/run-llm-summarizer/result.json"
+  },
+  "inputs": {
+    "dbPath": "/home/ubuntu/projects/github-digest/data/github_digest.db",
+    "maxRepos": 15,
+    "ollamaModel": "llama3.2",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

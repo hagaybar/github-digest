@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T10:01:46.296Z",
+  "data": {
+    "effectId": "01KHZTBV13W8MYWHBAYVD7A7AN",
+    "invocationKey": "github-digest/readme-llm-summaries:S000002:implement-llm-summarizer",
+    "invocationHash": "6f7686e0cb150c2332fcaa60a10ffbf276237c4a1654a0a7243952887f513088",
+    "stepId": "S000002",
+    "taskId": "implement-llm-summarizer",
+    "kind": "agent",
+    "label": "Implement README-based LLM summarizer",
+    "taskDefRef": "tasks/01KHZTBV13W8MYWHBAYVD7A7AN/task.json"
+  },
+  "checksum": "f059d2bf95e12c44436cc477ee783ac89377963820f817833dbe7c27c43e1e14"
+}

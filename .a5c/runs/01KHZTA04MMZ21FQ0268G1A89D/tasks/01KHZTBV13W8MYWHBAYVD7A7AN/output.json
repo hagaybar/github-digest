@@ -1,0 +1,1 @@
+{"filesCreated": ["/home/ubuntu/projects/github-digest/src/github_digest/services/llm_summarizer.py"], "importOk": true, "cliOk": true, "findings": "Created llm_summarizer.py with fetch_readme, build_llm_prompt, call_ollama, and make_llm_model_fn. Also updated cli.py to add summarize-llm subcommand. Both import and CLI help verified successfully."}

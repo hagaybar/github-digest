@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHZTAMPD2A4B10PNMBNZZ973",
+  "taskId": "ensure-ollama",
+  "invocationKey": "github-digest/readme-llm-summaries:S000001:ensure-ollama",
+  "stepId": "S000001",
+  "kind": "agent",
+  "title": "Ensure Ollama is running with Llama3 model",
+  "io": {
+    "inputJsonPath": "tasks/ensure-ollama/input.json",
+    "outputJsonPath": "tasks/ensure-ollama/result.json"
+  },
+  "inputs": {
+    "ollamaModel": "llama3.2"
+  }
+}

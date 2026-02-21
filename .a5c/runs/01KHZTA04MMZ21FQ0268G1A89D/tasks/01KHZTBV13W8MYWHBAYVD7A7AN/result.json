@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHZTBV13W8MYWHBAYVD7A7AN",
+  "taskId": "implement-llm-summarizer",
+  "invocationKey": "github-digest/readme-llm-summaries:S000002:implement-llm-summarizer",
+  "status": "ok",
+  "result": {
+    "cliOk": true,
+    "filesCreated": [
+      "/home/ubuntu/projects/github-digest/src/github_digest/services/llm_summarizer.py"
+    ],
+    "findings": "Created llm_summarizer.py with fetch_readme, build_llm_prompt, call_ollama, and make_llm_model_fn. Also updated cli.py to add summarize-llm subcommand. Both import and CLI help verified successfully.",
+    "importOk": true
+  },
+  "startedAt": "2026-02-21T10:04:30.910Z",
+  "finishedAt": "2026-02-21T10:04:30.910Z",
+  "value": {
+    "cliOk": true,
+    "filesCreated": [
+      "/home/ubuntu/projects/github-digest/src/github_digest/services/llm_summarizer.py"
+    ],
+    "findings": "Created llm_summarizer.py with fetch_readme, build_llm_prompt, call_ollama, and make_llm_model_fn. Also updated cli.py to add summarize-llm subcommand. Both import and CLI help verified successfully.",
+    "importOk": true
+  }
+}

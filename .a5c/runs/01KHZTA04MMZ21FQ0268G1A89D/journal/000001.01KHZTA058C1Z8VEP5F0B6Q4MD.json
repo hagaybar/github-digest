@@ -1,0 +1,14 @@
+{
+  "type": "RUN_CREATED",
+  "recordedAt": "2026-02-21T10:00:45.992Z",
+  "data": {
+    "runId": "01KHZTA04MMZ21FQ0268G1A89D",
+    "processId": "github-digest/readme-llm-summaries",
+    "entrypoint": {
+      "importPath": "../../processes/readme-llm-summaries.js",
+      "exportName": "process"
+    },
+    "inputsRef": "inputs.json"
+  },
+  "checksum": "718c66a7e0e3402eed7d89afb471ef21bd4649063629a3137d455afa5b191853"
+}

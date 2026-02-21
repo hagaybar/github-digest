@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T10:01:07.044Z",
+  "data": {
+    "effectId": "01KHZTAMPD2A4B10PNMBNZZ973",
+    "invocationKey": "github-digest/readme-llm-summaries:S000001:ensure-ollama",
+    "invocationHash": "e9240bbd99c6f3f7fd8c35ff16cb256bcbd714d935d9322ce694afc0dd454f70",
+    "stepId": "S000001",
+    "taskId": "ensure-ollama",
+    "kind": "agent",
+    "label": "Ensure Ollama is running with Llama3 model",
+    "taskDefRef": "tasks/01KHZTAMPD2A4B10PNMBNZZ973/task.json"
+  },
+  "checksum": "039e2ef57b3e5dab0758a5425002a6dc94113be15117aa9eec13c823972b9f80"
+}

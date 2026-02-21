@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHZTBV13W8MYWHBAYVD7A7AN",
+  "taskId": "implement-llm-summarizer",
+  "invocationKey": "github-digest/readme-llm-summaries:S000002:implement-llm-summarizer",
+  "stepId": "S000002",
+  "kind": "agent",
+  "title": "Implement README-based LLM summarizer",
+  "io": {
+    "inputJsonPath": "tasks/implement-llm-summarizer/input.json",
+    "outputJsonPath": "tasks/implement-llm-summarizer/result.json"
+  },
+  "inputs": {
+    "ollamaBaseUrl": "http://localhost:11434",
+    "ollamaModel": "llama3.2",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

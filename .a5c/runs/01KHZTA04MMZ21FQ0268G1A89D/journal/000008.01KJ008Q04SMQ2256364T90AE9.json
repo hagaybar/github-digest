@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T11:44:55.300Z",
+  "data": {
+    "effectId": "01KJ008PZGBEKK10NEACD7YVSS",
+    "invocationKey": "github-digest/readme-llm-summaries:S000004:verify-summaries",
+    "invocationHash": "146fecdeb22df29d7f52f01c72c97e636539c9a6afe3bc6fe7f24d65a9315ded",
+    "stepId": "S000004",
+    "taskId": "verify-summaries",
+    "kind": "agent",
+    "label": "Verify LLM summaries in DB and API",
+    "taskDefRef": "tasks/01KJ008PZGBEKK10NEACD7YVSS/task.json"
+  },
+  "checksum": "843cd09b0845c30563a0212f45f1ddb0a15afbc9061732ebe0b88fcdbd2bd3ee"
+}

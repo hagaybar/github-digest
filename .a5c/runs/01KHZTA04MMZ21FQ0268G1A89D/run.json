@@ -1,0 +1,13 @@
+{
+  "runId": "01KHZTA04MMZ21FQ0268G1A89D",
+  "request": "github-digest/readme-llm-summaries",
+  "processId": "github-digest/readme-llm-summaries",
+  "entrypoint": {
+    "importPath": "../../processes/readme-llm-summaries.js",
+    "exportName": "process"
+  },
+  "processPath": "../../processes/readme-llm-summaries.js",
+  "layoutVersion": "2026.01-storage-preview",
+  "createdAt": "2026-02-21T10:00:45.981Z",
+  "completionSecret": "bc790b243304550b9c5ead3dc39cddba"
+}
