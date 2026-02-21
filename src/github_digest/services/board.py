@@ -9,6 +9,7 @@ from typing import Any, Iterable
 from sqlalchemy import and_, desc, func, inspect, select
 from sqlalchemy.orm import Session
 
+from github_digest.config import settings
 from github_digest.db.models import Repo, RepoSearch, RepoStatsDaily, RepoSummary
 from github_digest.services.fetcher import SavedSearch
 
@@ -120,7 +121,8 @@ def get_board_for_query(
             include_summary=include_summary,
         )
     else:
-        items = _board_new(session, search, effective_window, limit, include_summary=include_summary)
+        new_cap = int(mode_defaults.get("new_stars_max", settings.new_stars_max))
+        items = _board_new(session, search, effective_window, limit, stars_max=new_cap, include_summary=include_summary)
 
     # Batch-load last 8 days of star history for all repos in this result
     if items:
@@ -150,6 +152,7 @@ def _board_new(
     search: SavedSearch,
     window_days: int,
     limit: int,
+    stars_max: int = 500000,
     include_summary: bool = True,
 ) -> list[BoardItem]:
     today = _today_filter()
@@ -172,7 +175,8 @@ def _board_new(
         .where(RepoSearch.query_name == search.name)
         .where(func.date(RepoSearch.last_seen_at) == today)
         .where(Repo.first_seen_at >= cutoff)
-        .order_by(desc(Repo.stars), desc(Repo.pushed_at))
+        .where(Repo.stars <= stars_max)
+        .order_by(desc(Repo.first_seen_at), desc(Repo.stars))
         .limit(limit)
     )
     results = session.execute(stmt).all()
@@ -320,7 +324,7 @@ def eligible_repo_ids_for_summaries(
 ) -> set[int]:
     repo_ids: set[int] = set()
     for search in searches:
-        new_items = _board_new(session, search, window_days, limit=100, include_summary=False)
+        new_items = _board_new(session, search, window_days, limit=100, stars_max=stars_max, include_summary=False)
         rising_items = _board_rising(
             session,
             search,

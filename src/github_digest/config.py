@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     user_agent: str = "github-digest/0.1"
     stars_min: int = 50
     stars_max: int = 500000
+    new_stars_max: int = 50000
     new_window_days: int = 7
     rising_window_days: int = 7
     updated_window_days: int = 30
