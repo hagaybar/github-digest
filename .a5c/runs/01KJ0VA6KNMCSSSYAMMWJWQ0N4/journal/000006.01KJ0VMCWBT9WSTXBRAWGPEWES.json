@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T19:43:09.708Z",
+  "data": {
+    "effectId": "01KJ0VMCVR9VCA5K8R8TRRBQQ8",
+    "invocationKey": "github-digest/builder-radar-pivot:S000003:create-hn-ingestion",
+    "invocationHash": "3e67842b66e8450f5151930cd498eca0e5145caa5e4cf574c09b628304a7755b",
+    "stepId": "S000003",
+    "taskId": "create-hn-ingestion",
+    "kind": "agent",
+    "label": "Implement Hacker News ingestion service",
+    "taskDefRef": "tasks/01KJ0VMCVR9VCA5K8R8TRRBQQ8/task.json"
+  },
+  "checksum": "6b78ff239acdb5d7813a2db61e61037c93d31109a81cf57d38fefd573f695424"
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ0VAGJWE68BXPC97GQQFTFD",
+  "taskId": "create-documentation",
+  "invocationKey": "github-digest/builder-radar-pivot:S000001:create-documentation",
+  "status": "ok",
+  "result": {
+    "docsCreated": true,
+    "findings": "Both documents created on github_radar branch. PRODUCT.md covers user story, daily UX, sources (GitHub v1, HN new, Reddit/RSS vNext), output contract, and non-goals. schemas/item_v1.md documents all ItemV1 fields across 9 top-level objects: identity, github_repo, content, signals, tags, analysis (with 3 build ideas), scores, daily_pick, pairing. Includes worked JSON example and storage notes.",
+    "productMdPath": "/home/ubuntu/projects/github-digest/PRODUCT.md",
+    "schemaPath": "/home/ubuntu/projects/github-digest/schemas/item_v1.md"
+  },
+  "startedAt": "2026-02-21T19:40:09.784Z",
+  "finishedAt": "2026-02-21T19:40:09.784Z",
+  "value": {
+    "docsCreated": true,
+    "findings": "Both documents created on github_radar branch. PRODUCT.md covers user story, daily UX, sources (GitHub v1, HN new, Reddit/RSS vNext), output contract, and non-goals. schemas/item_v1.md documents all ItemV1 fields across 9 top-level objects: identity, github_repo, content, signals, tags, analysis (with 3 build ideas), scores, daily_pick, pairing. Includes worked JSON example and storage notes.",
+    "productMdPath": "/home/ubuntu/projects/github-digest/PRODUCT.md",
+    "schemaPath": "/home/ubuntu/projects/github-digest/schemas/item_v1.md"
+  }
+}

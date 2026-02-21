@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T19:50:13.687Z",
+  "data": {
+    "effectId": "01KJ0W1AX4QAB9FPGW6VY1G1ZV",
+    "invocationKey": "github-digest/builder-radar-pivot:S000006:create-pairing-and-ui",
+    "invocationHash": "5cec7727747345777108e121502b341f9f629c28c453229fd978d9b0d8c92361",
+    "stepId": "S000006",
+    "taskId": "create-pairing-and-ui",
+    "kind": "agent",
+    "label": "Implement pairing engine and UI routes (/today, /build)",
+    "taskDefRef": "tasks/01KJ0W1AX4QAB9FPGW6VY1G1ZV/task.json"
+  },
+  "checksum": "769d33ad6a073492e474bdf8bc4afb131e2f7f488c8e46a35e22c14d615e7cc6"
+}

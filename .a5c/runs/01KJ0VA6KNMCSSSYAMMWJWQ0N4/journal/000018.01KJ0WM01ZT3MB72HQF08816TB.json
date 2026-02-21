@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T20:00:25.151Z",
+  "data": {
+    "effectId": "01KJ0WM00Y786D6SNE1K098JAK",
+    "invocationKey": "github-digest/builder-radar-pivot:S000009:final-quality-check",
+    "invocationHash": "f955704db0ebb7d58be4f101142118f292538c4c4a1f05f84967d80a2b4d1f53",
+    "stepId": "S000009",
+    "taskId": "final-quality-check",
+    "kind": "agent",
+    "label": "Final quality check: lint, tests, API smoke test",
+    "taskDefRef": "tasks/01KJ0WM00Y786D6SNE1K098JAK/task.json"
+  },
+  "checksum": "28315e7ab659502bb1dfdc04bae1b249f6b2bb67fd618e205f9146beabdcda87"
+}

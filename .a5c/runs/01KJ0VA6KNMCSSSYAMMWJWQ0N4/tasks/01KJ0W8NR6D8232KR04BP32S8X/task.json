@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ0W8NR6D8232KR04BP32S8X",
+  "taskId": "create-cli-pipeline",
+  "invocationKey": "github-digest/builder-radar-pivot:S000007:create-cli-pipeline",
+  "stepId": "S000007",
+  "kind": "agent",
+  "title": "Implement CLI commands and run_daily_pipeline.py",
+  "inputs": {
+    "allFindings": {
+      "docs": "Both documents created on github_radar branch. PRODUCT.md covers user story, daily UX, sources (GitHub v1, HN new, Reddit/RSS vNext), output contract, and non-goals. schemas/item_v1.md documents all ItemV1 fields across 9 top-level objects: identity, github_repo, content, signals, tags, analysis (with 3 build ideas), scores, daily_pick, pairing. Includes worked JSON example and storage notes.",
+      "hn": "Created HN ingestion service with all required components: extract_github_repo_from_url (handles .git, trailing slash, rejects subpaths), normalize_url (strips tracking params), fetch_hn_top_stories (uses httpx Firebase API), upsert_hn_story_raw (idempotent), story_to_radar_item_data (converts to RadarItem dict), upsert_radar_item (INSERT OR IGNORE + UPDATE pattern), ingest_hn (main entry point). All verification checks passed.",
+      "llm": "LLM card generator created with build_item_context, make_analysis_prompt, parse_analysis_response (with markdown stripping and retry), analyze_item_with_ollama, analyze_daily_picks. All verification checks passed including JSON parsing tests.",
+      "pairingUI": "All steps completed. pairing.py with 15 complementary pairs heuristics, bidirectional matching, cross-signal fallback, top 15. today.html and build.html match existing style. 4 API routes added to app.py (before existing / route). All HTTP 200 verified.",
+      "ranking": "Ranking module created with load_radar_config, get_signals, deduplicate_items (3-tier dedup), compute_momentum_score (log-scaled), compute_cool_score (0.5 baseline), compute_buildability_score, score_item (weighted sum), rank_candidates (full pipeline). PyYAML installed. All verification checks passed including functional smoke test with deduplication and scoring.",
+      "schema": "All steps completed successfully. config/radar_config.yaml created. 5 new ORM models added to models.py (HNStoryRaw, RadarItem, RadarItemAnalysis, DailyPick, DailyPairing). radar/schemas.py created with all Pydantic v2 models and make_item_id(). migrations.py updated with CREATE TABLE IF NOT EXISTS DDL for all 5 new tables plus indexes. All verification checks passed: Models OK, Schemas OK (SHA1 hash works), Tables OK."
+    },
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

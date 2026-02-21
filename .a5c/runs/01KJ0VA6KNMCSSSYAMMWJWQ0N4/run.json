@@ -1,0 +1,13 @@
+{
+  "runId": "01KJ0VA6KNMCSSSYAMMWJWQ0N4",
+  "request": "github-digest/builder-radar-pivot",
+  "processId": "github-digest/builder-radar-pivot",
+  "entrypoint": {
+    "importPath": "../../processes/builder-radar-pivot.js",
+    "exportName": "process"
+  },
+  "processPath": "../../processes/builder-radar-pivot.js",
+  "layoutVersion": "2026.01-storage-preview",
+  "createdAt": "2026-02-21T19:37:35.617Z",
+  "completionSecret": "566ccd57283f1367b598a86fc1148046"
+}

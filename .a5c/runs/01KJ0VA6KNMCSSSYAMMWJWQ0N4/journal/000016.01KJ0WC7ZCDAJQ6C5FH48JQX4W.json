@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T19:56:11.117Z",
+  "data": {
+    "effectId": "01KJ0WC7YSKAW061QVCGFG8Y8H",
+    "invocationKey": "github-digest/builder-radar-pivot:S000008:create-tests-verify",
+    "invocationHash": "feeecc825ed992eb7c44d57ab4e17d3c48871caedb89e2f3dcf949c82f6e84e0",
+    "stepId": "S000008",
+    "taskId": "create-tests-verify",
+    "kind": "agent",
+    "label": "Write unit/integration tests and verify the pipeline",
+    "taskDefRef": "tasks/01KJ0WC7YSKAW061QVCGFG8Y8H/task.json"
+  },
+  "checksum": "0ef8c698efa787f9e1156cbb36afac5ed52d07f2c77358a2209fd41e26110875"
+}

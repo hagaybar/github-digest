@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ0W1AX4QAB9FPGW6VY1G1ZV",
+  "taskId": "create-pairing-and-ui",
+  "invocationKey": "github-digest/builder-radar-pivot:S000006:create-pairing-and-ui",
+  "stepId": "S000006",
+  "kind": "agent",
+  "title": "Implement pairing engine and UI routes (/today, /build)",
+  "inputs": {
+    "llmFindings": "LLM card generator created with build_item_context, make_analysis_prompt, parse_analysis_response (with markdown stripping and retry), analyze_item_with_ollama, analyze_daily_picks. All verification checks passed including JSON parsing tests.",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

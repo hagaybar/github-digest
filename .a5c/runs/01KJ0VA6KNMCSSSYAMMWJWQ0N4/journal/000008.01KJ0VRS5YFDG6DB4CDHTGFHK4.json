@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T19:45:33.374Z",
+  "data": {
+    "effectId": "01KJ0VRS5AEEA91PPYPTQP6CA1",
+    "invocationKey": "github-digest/builder-radar-pivot:S000004:create-ranking-layer",
+    "invocationHash": "d62ad6a3ea9483833a2a7d27392dee707031ada479644bbd9c6c17a9837ee683",
+    "stepId": "S000004",
+    "taskId": "create-ranking-layer",
+    "kind": "agent",
+    "label": "Implement fusion, deduplication, and ranking layer",
+    "taskDefRef": "tasks/01KJ0VRS5AEEA91PPYPTQP6CA1/task.json"
+  },
+  "checksum": "d3b86684d01e73c3063d173bb614da1d08578a9f7c52795ad66080075bd5ed55"
+}

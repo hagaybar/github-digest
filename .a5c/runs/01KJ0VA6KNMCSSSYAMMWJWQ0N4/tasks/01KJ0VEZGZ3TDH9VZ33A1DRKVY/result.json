@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ0VEZGZ3TDH9VZ33A1DRKVY",
+  "taskId": "create-schema-models",
+  "invocationKey": "github-digest/builder-radar-pivot:S000002:create-schema-models",
+  "status": "ok",
+  "result": {
+    "filesCreated": [
+      "/home/ubuntu/projects/github-digest/config/radar_config.yaml",
+      "/home/ubuntu/projects/github-digest/src/github_digest/radar/__init__.py",
+      "/home/ubuntu/projects/github-digest/src/github_digest/radar/schemas.py",
+      "/home/ubuntu/projects/github-digest/src/github_digest/db/models.py",
+      "/home/ubuntu/projects/github-digest/src/github_digest/db/migrations.py"
+    ],
+    "findings": "All steps completed successfully. config/radar_config.yaml created. 5 new ORM models added to models.py (HNStoryRaw, RadarItem, RadarItemAnalysis, DailyPick, DailyPairing). radar/schemas.py created with all Pydantic v2 models and make_item_id(). migrations.py updated with CREATE TABLE IF NOT EXISTS DDL for all 5 new tables plus indexes. All verification checks passed: Models OK, Schemas OK (SHA1 hash works), Tables OK.",
+    "tablesAdded": [
+      "hn_story_raw",
+      "radar_items",
+      "radar_item_analysis",
+      "daily_picks",
+      "daily_pairings"
+    ]
+  },
+  "startedAt": "2026-02-21T19:43:04.607Z",
+  "finishedAt": "2026-02-21T19:43:04.607Z",
+  "value": {
+    "filesCreated": [
+      "/home/ubuntu/projects/github-digest/config/radar_config.yaml",
+      "/home/ubuntu/projects/github-digest/src/github_digest/radar/__init__.py",
+      "/home/ubuntu/projects/github-digest/src/github_digest/radar/schemas.py",
+      "/home/ubuntu/projects/github-digest/src/github_digest/db/models.py",
+      "/home/ubuntu/projects/github-digest/src/github_digest/db/migrations.py"
+    ],
+    "findings": "All steps completed successfully. config/radar_config.yaml created. 5 new ORM models added to models.py (HNStoryRaw, RadarItem, RadarItemAnalysis, DailyPick, DailyPairing). radar/schemas.py created with all Pydantic v2 models and make_item_id(). migrations.py updated with CREATE TABLE IF NOT EXISTS DDL for all 5 new tables plus indexes. All verification checks passed: Models OK, Schemas OK (SHA1 hash works), Tables OK.",
+    "tablesAdded": [
+      "hn_story_raw",
+      "radar_items",
+      "radar_item_analysis",
+      "daily_picks",
+      "daily_pairings"
+    ]
+  }
+}

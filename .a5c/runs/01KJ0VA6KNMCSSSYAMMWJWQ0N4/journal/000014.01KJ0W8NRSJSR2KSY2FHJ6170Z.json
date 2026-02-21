@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T19:54:14.169Z",
+  "data": {
+    "effectId": "01KJ0W8NR6D8232KR04BP32S8X",
+    "invocationKey": "github-digest/builder-radar-pivot:S000007:create-cli-pipeline",
+    "invocationHash": "ad9e60e2ecb154dcd43a936fcc946ea6d4d27d1b00439b5cf3d9ab80f51f1d01",
+    "stepId": "S000007",
+    "taskId": "create-cli-pipeline",
+    "kind": "agent",
+    "label": "Implement CLI commands and run_daily_pipeline.py",
+    "taskDefRef": "tasks/01KJ0W8NR6D8232KR04BP32S8X/task.json"
+  },
+  "checksum": "a1402d1243db90083fec1000235d8bee57f9e8141bb045c83eeeec5dc2efbaff"
+}

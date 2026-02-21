@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ0VX1Z4KFE9DSQFM7C75WCX",
+  "taskId": "create-llm-card-generator",
+  "invocationKey": "github-digest/builder-radar-pivot:S000005:create-llm-card-generator",
+  "stepId": "S000005",
+  "kind": "agent",
+  "title": "Implement LLM card generator (analysis layer)",
+  "inputs": {
+    "projectDir": "/home/ubuntu/projects/github-digest",
+    "rankingFindings": "Ranking module created with load_radar_config, get_signals, deduplicate_items (3-tier dedup), compute_momentum_score (log-scaled), compute_cool_score (0.5 baseline), compute_buildability_score, score_item (weighted sum), rank_candidates (full pipeline). PyYAML installed. All verification checks passed including functional smoke test with deduplication and scoring."
+  }
+}

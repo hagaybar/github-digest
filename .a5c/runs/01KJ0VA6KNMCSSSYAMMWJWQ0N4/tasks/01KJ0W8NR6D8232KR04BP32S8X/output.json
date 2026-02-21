@@ -1,0 +1,4 @@
+{
+  "commandsAdded": ["ingest-hn", "rank-daily", "analyze-daily", "pair-daily"],
+  "findings": "All CLI commands added to cli.py, run_daily_pipeline.py created. github-digest --help shows all 9 subcommands. health command still works. run_daily_pipeline.py --help shows correct flags."
+}
