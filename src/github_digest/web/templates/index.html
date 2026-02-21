@@ -87,6 +87,38 @@
         padding: 2px 8px;
         border-radius: 999px;
         font-size: 11px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .tag:hover {
+        background: #d8cdb8;
+      }
+      .tag.active {
+        background: #b8884a;
+        color: #fff;
+      }
+      .tag-filter {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #b8884a;
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+      }
+      .tag-filter button {
+        background: none;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        font-size: 15px;
+        padding: 0;
+        line-height: 1;
+        opacity: 0.8;
+      }
+      .tag-filter button:hover {
+        opacity: 1;
       }
       .sparkline {
         display: block;
@@ -166,27 +198,50 @@
         return svg;
       }
 
-      async function loadBoard() {
-        const mode = document.getElementById("mode").value;
-        const timeframe = document.getElementById("timeframe").value;
-        const response = await fetch(`/board/today?mode=${mode}&window_days=${timeframe}`);
-        const data = await response.json();
+      let boardData = {};
+      let activeTag = null;
+
+      function setActiveTag(tag) {
+        activeTag = activeTag === tag ? null : tag;
+        renderBoard();
+      }
+
+      function renderBoard() {
+        // Update filter pill in controls
+        const existingPill = document.getElementById("tag-filter-pill");
+        if (existingPill) existingPill.remove();
+        if (activeTag) {
+          const pill = document.createElement("div");
+          pill.id = "tag-filter-pill";
+          pill.className = "tag-filter";
+          pill.innerHTML = `<span>${activeTag}</span><button title="Clear filter">✕</button>`;
+          pill.querySelector("button").addEventListener("click", () => setActiveTag(activeTag));
+          document.querySelector(".controls").appendChild(pill);
+        }
+
         const boardEl = document.getElementById("board");
         boardEl.innerHTML = "";
 
-        Object.entries(data.board).forEach(([name, repos]) => {
+        Object.entries(boardData).forEach(([name, repos]) => {
+          const filtered = activeTag
+            ? repos.filter((r) => (r.tags || []).map((t) => t.toLowerCase()).includes(activeTag.toLowerCase()))
+            : repos;
+
+          // Hide entire card if filter leaves it empty (but only when filtering)
+          if (activeTag && filtered.length === 0) return;
+
           const card = document.createElement("div");
           card.className = "card";
           const title = document.createElement("h3");
           title.textContent = name;
           card.appendChild(title);
 
-          if (repos.length === 0) {
+          if (filtered.length === 0) {
             const empty = document.createElement("p");
             empty.textContent = "No repos yet. Run fetch.";
             card.appendChild(empty);
           } else {
-            repos.forEach((repo) => {
+            filtered.forEach((repo) => {
               const row = document.createElement("div");
               row.className = "repo";
               row.innerHTML = `<a href="${repo.html_url}" target="_blank">${repo.full_name}</a>`;
@@ -231,8 +286,9 @@
                   tags.className = "tags";
                   repo.tags.forEach((tag) => {
                     const chip = document.createElement("span");
-                    chip.className = "tag";
+                    chip.className = "tag" + (activeTag && tag.toLowerCase() === activeTag.toLowerCase() ? " active" : "");
                     chip.textContent = tag;
+                    chip.addEventListener("click", () => setActiveTag(tag));
                     tags.appendChild(chip);
                   });
                   row.appendChild(tags);
@@ -245,6 +301,17 @@
 
           boardEl.appendChild(card);
         });
+      }
+
+      async function loadBoard() {
+        activeTag = null;
+        const mode = document.getElementById("mode").value;
+        const timeframe = document.getElementById("timeframe").value;
+        document.getElementById("board").textContent = "Loading…";
+        const response = await fetch(`/board/today?mode=${mode}&window_days=${timeframe}`);
+        const data = await response.json();
+        boardData = data.board;
+        renderBoard();
       }
 
       document.getElementById("mode").addEventListener("change", loadBoard);
