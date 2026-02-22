@@ -11,6 +11,6 @@ ingestion:
   hn_fetch_interval_hours: 2
   hn_top_stories_count: 100
 llm:
-  enable_llm: false  # set to true to use LLM analysis
+  enable_llm: true  # set to true to use LLM analysis
   model: "llama3.2"
   ollama_base_url: "http://localhost:11434"
