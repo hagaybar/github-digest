@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T19:37:45.843Z",
+  "data": {
+    "effectId": "01KJ0VAGJWE68BXPC97GQQFTFD",
+    "invocationKey": "github-digest/builder-radar-pivot:S000001:create-documentation",
+    "invocationHash": "6798dac4b56e5bd6a71e7a58f4172d8cbd11ab51e7028fd22939998175530e4e",
+    "stepId": "S000001",
+    "taskId": "create-documentation",
+    "kind": "agent",
+    "label": "Create PRODUCT.md and canonical schema docs",
+    "taskDefRef": "tasks/01KJ0VAGJWE68BXPC97GQQFTFD/task.json"
+  },
+  "checksum": "3a1198656e44f50742b80035bce988c2e89aa393676682cdef3a7bfc1c69675c"
+}

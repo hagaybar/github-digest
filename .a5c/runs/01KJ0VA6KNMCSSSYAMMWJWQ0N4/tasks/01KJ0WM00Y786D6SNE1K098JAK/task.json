@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ0WM00Y786D6SNE1K098JAK",
+  "taskId": "final-quality-check",
+  "invocationKey": "github-digest/builder-radar-pivot:S000009:final-quality-check",
+  "stepId": "S000009",
+  "kind": "agent",
+  "title": "Final quality check: lint, tests, API smoke test",
+  "inputs": {
+    "projectDir": "/home/ubuntu/projects/github-digest",
+    "testFindings": "All tests created and passing. End-to-end pipeline test passed with temp DB: DB setup, HN story insert, ranking (1 pick), analysis (0 analyzed, LLM disabled), pairing (0 pairings, only 1 pick)."
+  }
+}

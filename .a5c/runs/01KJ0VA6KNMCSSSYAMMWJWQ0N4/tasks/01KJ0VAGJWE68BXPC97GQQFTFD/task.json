@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ0VAGJWE68BXPC97GQQFTFD",
+  "taskId": "create-documentation",
+  "invocationKey": "github-digest/builder-radar-pivot:S000001:create-documentation",
+  "stepId": "S000001",
+  "kind": "agent",
+  "title": "Create PRODUCT.md and canonical schema docs",
+  "inputs": {
+    "branch": "github_radar",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

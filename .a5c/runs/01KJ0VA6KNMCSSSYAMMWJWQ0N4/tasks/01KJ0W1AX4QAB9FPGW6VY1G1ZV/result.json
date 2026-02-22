@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ0W1AX4QAB9FPGW6VY1G1ZV",
+  "taskId": "create-pairing-and-ui",
+  "invocationKey": "github-digest/builder-radar-pivot:S000006:create-pairing-and-ui",
+  "status": "ok",
+  "result": {
+    "filesCreated": [
+      "/home/ubuntu/projects/github-digest/src/github_digest/radar/pairing.py",
+      "/home/ubuntu/projects/github-digest/src/github_digest/web/templates/today.html",
+      "/home/ubuntu/projects/github-digest/src/github_digest/web/templates/build.html"
+    ],
+    "findings": "All steps completed. pairing.py with 15 complementary pairs heuristics, bidirectional matching, cross-signal fallback, top 15. today.html and build.html match existing style. 4 API routes added to app.py (before existing / route). All HTTP 200 verified.",
+    "routesAdded": [
+      "/api/today",
+      "/api/build",
+      "/today",
+      "/build"
+    ]
+  },
+  "startedAt": "2026-02-21T19:54:10.261Z",
+  "finishedAt": "2026-02-21T19:54:10.261Z",
+  "value": {
+    "filesCreated": [
+      "/home/ubuntu/projects/github-digest/src/github_digest/radar/pairing.py",
+      "/home/ubuntu/projects/github-digest/src/github_digest/web/templates/today.html",
+      "/home/ubuntu/projects/github-digest/src/github_digest/web/templates/build.html"
+    ],
+    "findings": "All steps completed. pairing.py with 15 complementary pairs heuristics, bidirectional matching, cross-signal fallback, top 15. today.html and build.html match existing style. 4 API routes added to app.py (before existing / route). All HTTP 200 verified.",
+    "routesAdded": [
+      "/api/today",
+      "/api/build",
+      "/today",
+      "/build"
+    ]
+  }
+}

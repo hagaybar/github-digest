@@ -1,0 +1,4 @@
+{
+  "fileCreated": "/home/ubuntu/projects/github-digest/src/github_digest/radar/ranking.py",
+  "findings": "Ranking module created with load_radar_config, get_signals, deduplicate_items (3-tier dedup), compute_momentum_score (log-scaled), compute_cool_score (0.5 baseline), compute_buildability_score, score_item (weighted sum), rank_candidates (full pipeline). PyYAML installed. All verification checks passed including functional smoke test with deduplication and scoring."
+}

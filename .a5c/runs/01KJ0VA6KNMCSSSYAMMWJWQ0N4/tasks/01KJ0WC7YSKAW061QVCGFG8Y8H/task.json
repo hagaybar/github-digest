@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ0WC7YSKAW061QVCGFG8Y8H",
+  "taskId": "create-tests-verify",
+  "invocationKey": "github-digest/builder-radar-pivot:S000008:create-tests-verify",
+  "stepId": "S000008",
+  "kind": "agent",
+  "title": "Write unit/integration tests and verify the pipeline",
+  "inputs": {
+    "cliFindings": "All CLI commands added to cli.py, run_daily_pipeline.py created. github-digest --help shows all 9 subcommands. health command still works. run_daily_pipeline.py --help shows correct flags.",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

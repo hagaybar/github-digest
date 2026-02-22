@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ0VMCVR9VCA5K8R8TRRBQQ8",
+  "taskId": "create-hn-ingestion",
+  "invocationKey": "github-digest/builder-radar-pivot:S000003:create-hn-ingestion",
+  "stepId": "S000003",
+  "kind": "agent",
+  "title": "Implement Hacker News ingestion service",
+  "inputs": {
+    "projectDir": "/home/ubuntu/projects/github-digest",
+    "schemaFindings": "All steps completed successfully. config/radar_config.yaml created. 5 new ORM models added to models.py (HNStoryRaw, RadarItem, RadarItemAnalysis, DailyPick, DailyPairing). radar/schemas.py created with all Pydantic v2 models and make_item_id(). migrations.py updated with CREATE TABLE IF NOT EXISTS DDL for all 5 new tables plus indexes. All verification checks passed: Models OK, Schemas OK (SHA1 hash works), Tables OK."
+  }
+}

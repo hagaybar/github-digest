@@ -1,0 +1,16 @@
+scoring:
+  weights:
+    momentum: 0.5
+    cool: 0.3
+    buildability: 0.2
+ranking:
+  top_k_for_llm: 30
+  daily_picks_count: 7
+  candidate_window_hours: 48
+ingestion:
+  hn_fetch_interval_hours: 2
+  hn_top_stories_count: 100
+llm:
+  enable_llm: false  # set to true to use LLM analysis
+  model: "llama3.2"
+  ollama_base_url: "http://localhost:11434"

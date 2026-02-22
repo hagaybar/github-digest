@@ -1,0 +1,14 @@
+{
+  "type": "RUN_CREATED",
+  "recordedAt": "2026-02-21T19:37:35.631Z",
+  "data": {
+    "runId": "01KJ0VA6KNMCSSSYAMMWJWQ0N4",
+    "processId": "github-digest/builder-radar-pivot",
+    "entrypoint": {
+      "importPath": "../../processes/builder-radar-pivot.js",
+      "exportName": "process"
+    },
+    "inputsRef": "inputs.json"
+  },
+  "checksum": "20233d3bdb4cb4438720d3a9f68ca89679ea8bbf738993736618998977adf502"
+}

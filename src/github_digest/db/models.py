@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Integer, PrimaryKeyConstraint, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
@@ -84,3 +84,83 @@ class Run(Base):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     status: Mapped[str] = mapped_column(String(30), default="started")
     detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+# ---------------------------------------------------------------------------
+# Builder Radar models
+# ---------------------------------------------------------------------------
+
+
+class HNStoryRaw(Base):
+    __tablename__ = "hn_story_raw"
+
+    hn_id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    title: Mapped[str] = mapped_column(Text)
+    url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    comments: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    time: Mapped[int] = mapped_column(Integer)
+    raw_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    collected_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class RadarItem(Base):
+    __tablename__ = "radar_items"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    source: Mapped[str] = mapped_column(String(50))
+    source_id: Mapped[str] = mapped_column(String(255))
+    url: Mapped[str] = mapped_column(Text)
+    title: Mapped[str] = mapped_column(Text)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    collected_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    github_full_name: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    signals_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    tags_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    scores_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("source", "source_id", name="uq_radar_items_source_source_id"),
+    )
+
+    analyses: Mapped[list[RadarItemAnalysis]] = relationship("RadarItemAnalysis", back_populates="item")
+
+
+class RadarItemAnalysis(Base):
+    __tablename__ = "radar_item_analysis"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    item_id: Mapped[str] = mapped_column(String(40), ForeignKey("radar_items.id"), index=True)
+    analysis_version: Mapped[str] = mapped_column(String(20), default="v1")
+    analysis_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    __table_args__ = (
+        UniqueConstraint("item_id", "analysis_version", name="uq_analysis_item_version"),
+    )
+
+    item: Mapped[RadarItem] = relationship("RadarItem", back_populates="analyses")
+
+
+class DailyPick(Base):
+    __tablename__ = "daily_picks"
+
+    date: Mapped[str] = mapped_column(String(10))
+    rank: Mapped[int] = mapped_column(Integer)
+    item_id: Mapped[str] = mapped_column(String(40), ForeignKey("radar_items.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    __table_args__ = (PrimaryKeyConstraint("date", "rank"),)
+
+
+class DailyPairing(Base):
+    __tablename__ = "daily_pairings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    date: Mapped[str] = mapped_column(String(10), index=True)
+    rank: Mapped[int] = mapped_column(Integer)
+    item_id_a: Mapped[str] = mapped_column(String(40), ForeignKey("radar_items.id"))
+    item_id_b: Mapped[str] = mapped_column(String(40), ForeignKey("radar_items.id"))
+    rationale: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ0WC7YSKAW061QVCGFG8Y8H",
+  "taskId": "create-tests-verify",
+  "invocationKey": "github-digest/builder-radar-pivot:S000008:create-tests-verify",
+  "status": "ok",
+  "result": {
+    "findings": "All tests created and passing. End-to-end pipeline test passed with temp DB: DB setup, HN story insert, ranking (1 pick), analysis (0 analyzed, LLM disabled), pairing (0 pairings, only 1 pick).",
+    "testResults": "105 passed in 3.89s (90 new + 15 pre-existing). One test fix applied (different URLs for github_full_name test).",
+    "testsCreated": [
+      "tests/test_hn_ingestion.py",
+      "tests/test_ranking.py",
+      "tests/test_schemas.py",
+      "tests/fixtures/hn_stories_sample.json"
+    ],
+    "testsPassed": true
+  },
+  "startedAt": "2026-02-21T20:00:19.715Z",
+  "finishedAt": "2026-02-21T20:00:19.715Z",
+  "value": {
+    "findings": "All tests created and passing. End-to-end pipeline test passed with temp DB: DB setup, HN story insert, ranking (1 pick), analysis (0 analyzed, LLM disabled), pairing (0 pairings, only 1 pick).",
+    "testResults": "105 passed in 3.89s (90 new + 15 pre-existing). One test fix applied (different URLs for github_full_name test).",
+    "testsCreated": [
+      "tests/test_hn_ingestion.py",
+      "tests/test_ranking.py",
+      "tests/test_schemas.py",
+      "tests/fixtures/hn_stories_sample.json"
+    ],
+    "testsPassed": true
+  }
+}

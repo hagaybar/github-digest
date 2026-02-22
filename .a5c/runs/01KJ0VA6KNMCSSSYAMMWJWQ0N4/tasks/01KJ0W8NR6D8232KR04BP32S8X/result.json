@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ0W8NR6D8232KR04BP32S8X",
+  "taskId": "create-cli-pipeline",
+  "invocationKey": "github-digest/builder-radar-pivot:S000007:create-cli-pipeline",
+  "status": "ok",
+  "result": {
+    "commandsAdded": [
+      "ingest-hn",
+      "rank-daily",
+      "analyze-daily",
+      "pair-daily"
+    ],
+    "findings": "All CLI commands added to cli.py, run_daily_pipeline.py created. github-digest --help shows all 9 subcommands. health command still works. run_daily_pipeline.py --help shows correct flags."
+  },
+  "startedAt": "2026-02-21T19:56:07.158Z",
+  "finishedAt": "2026-02-21T19:56:07.158Z",
+  "value": {
+    "commandsAdded": [
+      "ingest-hn",
+      "rank-daily",
+      "analyze-daily",
+      "pair-daily"
+    ],
+    "findings": "All CLI commands added to cli.py, run_daily_pipeline.py created. github-digest --help shows all 9 subcommands. health command still works. run_daily_pipeline.py --help shows correct flags."
+  }
+}

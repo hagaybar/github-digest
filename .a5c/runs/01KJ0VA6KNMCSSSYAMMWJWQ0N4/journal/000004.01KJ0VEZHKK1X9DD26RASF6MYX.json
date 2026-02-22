@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T19:40:12.212Z",
+  "data": {
+    "effectId": "01KJ0VEZGZ3TDH9VZ33A1DRKVY",
+    "invocationKey": "github-digest/builder-radar-pivot:S000002:create-schema-models",
+    "invocationHash": "eb7080b87ddbd64b22f4f52cca8fd3ebe5ffdf2d77708e956f19b3aaa7606698",
+    "stepId": "S000002",
+    "taskId": "create-schema-models",
+    "kind": "agent",
+    "label": "Create new DB tables, ORM models, migrations, and config.yaml",
+    "taskDefRef": "tasks/01KJ0VEZGZ3TDH9VZ33A1DRKVY/task.json"
+  },
+  "checksum": "338f3ff2b042478682b6db305e75ee5f0097494905e431c6a4bc0dd11090637c"
+}

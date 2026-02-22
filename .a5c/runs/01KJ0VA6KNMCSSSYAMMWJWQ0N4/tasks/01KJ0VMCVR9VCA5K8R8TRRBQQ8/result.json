@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ0VMCVR9VCA5K8R8TRRBQQ8",
+  "taskId": "create-hn-ingestion",
+  "invocationKey": "github-digest/builder-radar-pivot:S000003:create-hn-ingestion",
+  "status": "ok",
+  "result": {
+    "fileCreated": "/home/ubuntu/projects/github-digest/src/github_digest/radar/hn_ingestion.py",
+    "findings": "Created HN ingestion service with all required components: extract_github_repo_from_url (handles .git, trailing slash, rejects subpaths), normalize_url (strips tracking params), fetch_hn_top_stories (uses httpx Firebase API), upsert_hn_story_raw (idempotent), story_to_radar_item_data (converts to RadarItem dict), upsert_radar_item (INSERT OR IGNORE + UPDATE pattern), ingest_hn (main entry point). All verification checks passed."
+  },
+  "startedAt": "2026-02-21T19:45:29.279Z",
+  "finishedAt": "2026-02-21T19:45:29.279Z",
+  "value": {
+    "fileCreated": "/home/ubuntu/projects/github-digest/src/github_digest/radar/hn_ingestion.py",
+    "findings": "Created HN ingestion service with all required components: extract_github_repo_from_url (handles .git, trailing slash, rejects subpaths), normalize_url (strips tracking params), fetch_hn_top_stories (uses httpx Firebase API), upsert_hn_story_raw (idempotent), story_to_radar_item_data (converts to RadarItem dict), upsert_radar_item (INSERT OR IGNORE + UPDATE pattern), ingest_hn (main entry point). All verification checks passed."
+  }
+}

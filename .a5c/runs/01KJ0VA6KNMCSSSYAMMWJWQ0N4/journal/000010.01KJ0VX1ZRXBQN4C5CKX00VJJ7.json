@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-21T19:47:53.465Z",
+  "data": {
+    "effectId": "01KJ0VX1Z4KFE9DSQFM7C75WCX",
+    "invocationKey": "github-digest/builder-radar-pivot:S000005:create-llm-card-generator",
+    "invocationHash": "6521fdd15b51c80e6b90fc7ad1f7f8e95d74e0dda0a7bce6708e4c0c9910e73f",
+    "stepId": "S000005",
+    "taskId": "create-llm-card-generator",
+    "kind": "agent",
+    "label": "Implement LLM card generator (analysis layer)",
+    "taskDefRef": "tasks/01KJ0VX1Z4KFE9DSQFM7C75WCX/task.json"
+  },
+  "checksum": "f83430b530af29b930cae7adc7f9316377730ee96403ca6d37066f61b6cff130"
+}

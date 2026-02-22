@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Builder Radar — Build With This</title>
+  <style>
+    :root { color-scheme: light; font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif; background: #f7f4ef; color: #2a2a2a; }
+    body { margin: 0; padding: 24px; }
+    nav { margin-bottom: 20px; }
+    nav a { color: #6a5d54; text-decoration: none; margin-right: 16px; font-size: 14px; }
+    nav a:hover { text-decoration: underline; }
+    h1 { margin: 0 0 4px; font-size: 28px; }
+    .subtitle { color: #6a5d54; margin: 0 0 24px; font-size: 14px; }
+    .pairings { display: grid; gap: 20px; }
+    .pairing { background: #fffaf3; border: 1px solid #eadfcd; border-radius: 12px; padding: 20px; }
+    .pairing-title { font-size: 17px; font-weight: bold; margin: 0 0 8px; }
+    .pairing-title a { color: #2a2a2a; text-decoration: none; }
+    .pairing-title a:hover { text-decoration: underline; }
+    .connector { color: #a08060; margin: 0 8px; }
+    .rationale { color: #6a5d54; font-size: 14px; margin: 8px 0 16px; font-style: italic; }
+    .pair-items { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .pair-items { grid-template-columns: 1fr; } }
+    .pair-item { border-left: 3px solid #eadfcd; padding-left: 12px; }
+    .pair-item h3 { margin: 0 0 4px; font-size: 14px; }
+    .pair-item h3 a { color: #2a2a2a; text-decoration: none; }
+    .pair-item h3 a:hover { text-decoration: underline; }
+    .pair-item .unlock { color: #4a3f36; font-size: 13px; font-style: italic; }
+    .pair-item .best-start { color: #6a5d54; font-size: 12px; margin-top: 4px; }
+    .empty { color: #6a5d54; text-align: center; padding: 48px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">&#8592; GitHub Digest</a>
+    <a href="/today">Today's 7</a>
+    <a href="/build"><strong>Build With This &#8594;</strong></a>
+  </nav>
+  <h1>Build With This</h1>
+  <p class="subtitle">Today's tool pairings &middot; {{ date }}</p>
+
+  {% if pairings %}
+  <div class="pairings">
+    {% for pairing in pairings %}
+    <div class="pairing">
+      <div class="pairing-title">
+        <a href="{{ pairing.item_a.url }}" target="_blank">{{ pairing.item_a.title }}</a>
+        <span class="connector">+</span>
+        <a href="{{ pairing.item_b.url }}" target="_blank">{{ pairing.item_b.title }}</a>
+      </div>
+      <p class="rationale">{{ pairing.rationale }}</p>
+      <div class="pair-items">
+        <div class="pair-item">
+          <h3><a href="{{ pairing.item_a.url }}" target="_blank" rel="noopener">{{ pairing.item_a.title }}</a></h3>
+          {% if pairing.item_a.analysis and pairing.item_a.analysis.unlock %}
+          <p class="unlock">{{ pairing.item_a.analysis.unlock }}</p>
+          {% endif %}
+          {% if pairing.item_a.analysis and pairing.item_a.analysis.best_start %}
+          <p class="best-start">Start: {{ pairing.item_a.analysis.best_start }}</p>
+          {% endif %}
+        </div>
+        <div class="pair-item">
+          <h3><a href="{{ pairing.item_b.url }}" target="_blank" rel="noopener">{{ pairing.item_b.title }}</a></h3>
+          {% if pairing.item_b.analysis and pairing.item_b.analysis.unlock %}
+          <p class="unlock">{{ pairing.item_b.analysis.unlock }}</p>
+          {% endif %}
+          {% if pairing.item_b.analysis and pairing.item_b.analysis.best_start %}
+          <p class="best-start">Start: {{ pairing.item_b.analysis.best_start }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">No pairings for today yet. Run the pipeline to populate.</div>
+  {% endif %}
+</body>
+</html>
