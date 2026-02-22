@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ1XXXGREFJZZE64A76XEEYW",
+  "taskId": "run-pipeline",
+  "invocationKey": "github-digest/unified-page:S000003:run-pipeline",
+  "status": "ok",
+  "result": {
+    "analysisCount": 7,
+    "apiBuildCount": 0,
+    "apiTodayCount": 7,
+    "dailyPicksCount": 7,
+    "error": "4/7 items have LLM analysis (3 failed JSON parse - llama3.2 timeout/malformed JSON). Pairings=0 (pairing engine needs GitHub-linked items with full analysis). Timeout raised to 180s in card_generator.py.",
+    "llmAnalysisWorked": true,
+    "pairingsCount": 0,
+    "pipelineRun": true,
+    "pipelineSteps": [
+      "ingest-hn",
+      "rank-daily",
+      "analyze-daily",
+      "pair-daily"
+    ],
+    "serverRestarted": true
+  },
+  "startedAt": "2026-02-22T06:08:55.158Z",
+  "finishedAt": "2026-02-22T06:08:55.158Z",
+  "value": {
+    "analysisCount": 7,
+    "apiBuildCount": 0,
+    "apiTodayCount": 7,
+    "dailyPicksCount": 7,
+    "error": "4/7 items have LLM analysis (3 failed JSON parse - llama3.2 timeout/malformed JSON). Pairings=0 (pairing engine needs GitHub-linked items with full analysis). Timeout raised to 180s in card_generator.py.",
+    "llmAnalysisWorked": true,
+    "pairingsCount": 0,
+    "pipelineRun": true,
+    "pipelineSteps": [
+      "ingest-hn",
+      "rank-daily",
+      "analyze-daily",
+      "pair-daily"
+    ],
+    "serverRestarted": true
+  }
+}

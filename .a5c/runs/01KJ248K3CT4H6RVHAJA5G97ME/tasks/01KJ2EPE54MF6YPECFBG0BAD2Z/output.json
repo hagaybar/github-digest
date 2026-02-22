@@ -1,0 +1,4 @@
+{
+  "summary": "Added write_heartbeat() calls inside run_analyze_worker() in card_generator.py: called after item claim (before Ollama) and after each complete/fail. orchestrator.py already contains check_worker_stuck(), write_heartbeat(), restart_stuck_worker(), run_watchdog(). watchdog CLI command already registered in cli.py.",
+  "filesCreated": ["src/github_digest/radar/card_generator.py (modified)"]
+}

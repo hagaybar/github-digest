@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T05:39:19.205Z",
+  "data": {
+    "effectId": "01KJ1XR00GE1MPHRBT279BQA64",
+    "invocationKey": "github-digest/unified-page:S000002:build-unified-page",
+    "invocationHash": "08ff4e57aa9abfb3e6b63c766be6de3a35daa6e4d4b5b2c72b53a5fef647ff8d",
+    "stepId": "S000002",
+    "taskId": "build-unified-page",
+    "kind": "agent",
+    "label": "Build Unified Tabbed Page",
+    "taskDefRef": "tasks/01KJ1XR00GE1MPHRBT279BQA64/task.json"
+  },
+  "checksum": "9303f8a6db5d23cbe0c65957bb7461677167e7c128da8ca2793eeffe1cf21337"
+}

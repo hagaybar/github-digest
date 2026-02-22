@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T10:41:01.097Z",
+  "data": {
+    "effectId": "01KJ2F0DMN7GW4KFB3CGWWB2C6",
+    "invocationKey": "github-digest/orchestrator-setup:S000008:run-smoke-tests",
+    "invocationHash": "d3babe82b0a5d279ce2efe4fc2d71f83c5eea3b4302f2c538b391f6b5231b78b",
+    "stepId": "S000008",
+    "taskId": "run-smoke-tests",
+    "kind": "agent",
+    "label": "Run smoke tests and dry-run",
+    "taskDefRef": "tasks/01KJ2F0DMN7GW4KFB3CGWWB2C6/task.json"
+  },
+  "checksum": "15fd88a8ee04d6788aac2e7e787ef96644814c859eabe8ac7fe56c99da3af930"
+}

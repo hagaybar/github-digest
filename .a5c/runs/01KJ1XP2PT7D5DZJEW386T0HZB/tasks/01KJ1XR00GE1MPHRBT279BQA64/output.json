@@ -1,0 +1,1 @@
+{"filesModified":["src/github_digest/web/templates/index.html"],"indexHtmlLines":1068,"appPyChanged":false,"issues":[],"implementationNotes":"Unified three-tab index.html (1068 lines). Tab 1=Digest Board (all original JS preserved), Tab 2=Today's 7 (/api/today), Tab 3=Build Pairings (/api/build). URL hash routing, lazy loading, consistent earth-tone design."}

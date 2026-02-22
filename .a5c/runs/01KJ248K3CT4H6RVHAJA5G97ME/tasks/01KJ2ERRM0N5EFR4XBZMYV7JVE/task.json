@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ2ERRM0N5EFR4XBZMYV7JVE",
+  "taskId": "create-systemd-units",
+  "invocationKey": "github-digest/orchestrator-setup:S000005:create-systemd-units",
+  "stepId": "S000005",
+  "kind": "agent",
+  "title": "Create systemd units and watchdog",
+  "io": {
+    "inputJsonPath": "tasks/01KJ2ERRM0N5EFR4XBZMYV7JVE/input.json",
+    "outputJsonPath": "tasks/01KJ2ERRM0N5EFR4XBZMYV7JVE/output.json"
+  },
+  "inputs": {
+    "branch": "orchestrator",
+    "heartbeatSummary": "Added write_heartbeat() calls inside run_analyze_worker() in card_generator.py: called after item claim (before Ollama) and after each complete/fail. orchestrator.py already contains check_worker_stuck(), write_heartbeat(), restart_stuck_worker(), run_watchdog(). watchdog CLI command already registered in cli.py.",
+    "orchestratorSummary": "Created src/github_digest/services/orchestrator.py with: run_orchestrate_daily() (prerequisites check, flock, worker PID guard, ordered pipeline steps), get_orchestrate_status() (API/Ollama/worker/queue status), run_watchdog() (health check + stuck detection + restart), check_worker_running(), check_worker_stuck(), write_heartbeat(), restart_stuck_worker(). Added orchestrate-daily, orchestrate-status, watchdog subcommands to cli.py. All imports verified OK.",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

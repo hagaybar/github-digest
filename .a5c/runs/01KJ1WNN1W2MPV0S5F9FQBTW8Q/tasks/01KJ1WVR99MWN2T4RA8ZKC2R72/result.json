@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ1WVR99MWN2T4RA8ZKC2R72",
+  "taskId": "scheduler-diagnosis",
+  "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000003:scheduler-diagnosis",
+  "status": "ok",
+  "result": {
+    "cronEntries": [],
+    "cronExists": false,
+    "fetchTimerSchedule": "daily at 08:00 UTC (OnCalendar=*-*-* 08:00:00)",
+    "lastScheduledRun": "2026-02-21T12:00:00Z (Persistent=true caused late fire after missed 08:00 window)",
+    "radarTimerExists": false,
+    "recommendedFix": "1. Merge or deploy github_radar branch. 2. Create github-digest-radar.service + github-digest-radar.timer (OnCalendar=*-*-* 09:00:00, one hour after fetch). 3. systemctl daemon-reload && systemctl enable --now github-digest-radar.timer",
+    "schedulerRootCause": "GitHub Radar pipeline (ingest-hn, rank-daily, etc.) lives on 'github_radar' branch only. No systemd unit or crontab exists for it. The installed systemd units only cover fetch and summarize on main branch.",
+    "suggestedCrontab": "# Daily fetch (08:00 UTC)\n0 8 * * * cd /opt/github-digest && flock -n /tmp/gd-fetch.lock .venv/bin/github-digest fetch >> /var/log/github-digest/fetch.log 2>&1\n# Radar pipeline (09:00 UTC, after fetch)\n0 9 * * * cd /opt/github-digest && flock -n /tmp/gd-radar.lock .venv/bin/python3 run_daily_pipeline.py --skip-github >> /var/log/github-digest/radar.log 2>&1",
+    "timerExists": true,
+    "timerStatus": "active"
+  },
+  "startedAt": "2026-02-22T05:25:03.902Z",
+  "finishedAt": "2026-02-22T05:25:03.902Z",
+  "value": {
+    "cronEntries": [],
+    "cronExists": false,
+    "fetchTimerSchedule": "daily at 08:00 UTC (OnCalendar=*-*-* 08:00:00)",
+    "lastScheduledRun": "2026-02-21T12:00:00Z (Persistent=true caused late fire after missed 08:00 window)",
+    "radarTimerExists": false,
+    "recommendedFix": "1. Merge or deploy github_radar branch. 2. Create github-digest-radar.service + github-digest-radar.timer (OnCalendar=*-*-* 09:00:00, one hour after fetch). 3. systemctl daemon-reload && systemctl enable --now github-digest-radar.timer",
+    "schedulerRootCause": "GitHub Radar pipeline (ingest-hn, rank-daily, etc.) lives on 'github_radar' branch only. No systemd unit or crontab exists for it. The installed systemd units only cover fetch and summarize on main branch.",
+    "suggestedCrontab": "# Daily fetch (08:00 UTC)\n0 8 * * * cd /opt/github-digest && flock -n /tmp/gd-fetch.lock .venv/bin/github-digest fetch >> /var/log/github-digest/fetch.log 2>&1\n# Radar pipeline (09:00 UTC, after fetch)\n0 9 * * * cd /opt/github-digest && flock -n /tmp/gd-radar.lock .venv/bin/python3 run_daily_pipeline.py --skip-github >> /var/log/github-digest/radar.log 2>&1",
+    "timerExists": true,
+    "timerStatus": "active"
+  }
+}

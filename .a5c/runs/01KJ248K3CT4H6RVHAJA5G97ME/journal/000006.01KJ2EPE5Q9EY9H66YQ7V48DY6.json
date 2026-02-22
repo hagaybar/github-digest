@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T10:35:33.943Z",
+  "data": {
+    "effectId": "01KJ2EPE54MF6YPECFBG0BAD2Z",
+    "invocationKey": "github-digest/orchestrator-setup:S000003:implement-heartbeat",
+    "invocationHash": "8eaa7f7ca3dc9bc8a33c4f20f558b73f502e16c9c1139c7c6728d8dab07045e1",
+    "stepId": "S000003",
+    "taskId": "implement-heartbeat",
+    "kind": "agent",
+    "label": "Worker heartbeat + stuck detection",
+    "taskDefRef": "tasks/01KJ2EPE54MF6YPECFBG0BAD2Z/task.json"
+  },
+  "checksum": "072073d1226c434f19dc0338f9c4c852b7c4d4450e7857d861bef21f62a3b594"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T05:20:42.167Z",
+  "data": {
+    "effectId": "01KJ1WNX51XF7G6QFDY2FZ0NWZ",
+    "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000001:diagnosis",
+    "invocationHash": "455d7bf43e2fd237a87c0a79c383f71e7a74bc476ec0c8943199fa8f5a264a57",
+    "stepId": "S000001",
+    "taskId": "diagnosis",
+    "kind": "agent",
+    "label": "Comprehensive Diagnosis",
+    "taskDefRef": "tasks/01KJ1WNX51XF7G6QFDY2FZ0NWZ/task.json"
+  },
+  "checksum": "a70ccbd608377fe9832733e8aaea7d2d791878fb5432ffdf8f8c55cf9a7551ea"
+}

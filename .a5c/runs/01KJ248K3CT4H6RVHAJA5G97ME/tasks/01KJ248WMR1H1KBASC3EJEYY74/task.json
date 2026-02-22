@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ248WMR1H1KBASC3EJEYY74",
+  "taskId": "branch-and-analyze",
+  "invocationKey": "github-digest/orchestrator-setup:S000001:branch-and-analyze",
+  "stepId": "S000001",
+  "kind": "agent",
+  "title": "Create branch and analyze codebase",
+  "io": {
+    "inputJsonPath": "tasks/01KJ248WMR1H1KBASC3EJEYY74/input.json",
+    "outputJsonPath": "tasks/01KJ248WMR1H1KBASC3EJEYY74/output.json"
+  },
+  "inputs": {
+    "branch": "orchestrator",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

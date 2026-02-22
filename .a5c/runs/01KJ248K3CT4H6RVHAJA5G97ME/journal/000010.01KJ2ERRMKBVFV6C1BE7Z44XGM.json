@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T10:36:50.196Z",
+  "data": {
+    "effectId": "01KJ2ERRM0N5EFR4XBZMYV7JVE",
+    "invocationKey": "github-digest/orchestrator-setup:S000005:create-systemd-units",
+    "invocationHash": "3c804fe880779d6377d4fb49964c7270bec2d4ca0d1c3dd772f24b007cd6fa55",
+    "stepId": "S000005",
+    "taskId": "create-systemd-units",
+    "kind": "agent",
+    "label": "Create systemd units and watchdog",
+    "taskDefRef": "tasks/01KJ2ERRM0N5EFR4XBZMYV7JVE/task.json"
+  },
+  "checksum": "96a608854d55e1e2f034db5dbc6b5b8d8606fe4884781bb8356d81781eee456c"
+}

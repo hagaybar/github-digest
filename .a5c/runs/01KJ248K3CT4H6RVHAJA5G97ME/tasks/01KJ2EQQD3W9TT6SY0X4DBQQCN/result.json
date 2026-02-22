@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ2EQQD3W9TT6SY0X4DBQQCN",
+  "taskId": "extend-health-endpoint",
+  "invocationKey": "github-digest/orchestrator-setup:S000004:extend-health-endpoint",
+  "status": "ok",
+  "result": {
+    "filesCreated": [
+      "src/github_digest/api/app.py (modified)"
+    ],
+    "summary": "Extended /health endpoint in api/app.py: now returns status (ok/degraded/error), db.connected, db.tables (radar_items, daily_picks_today, radar_item_analysis counts), ollama (reachable, model_available, model). Backwards compatible - all existing fields preserved. Ollama check uses 2s timeout, never crashes the endpoint."
+  },
+  "startedAt": "2026-02-22T10:36:45.368Z",
+  "finishedAt": "2026-02-22T10:36:45.368Z",
+  "value": {
+    "filesCreated": [
+      "src/github_digest/api/app.py (modified)"
+    ],
+    "summary": "Extended /health endpoint in api/app.py: now returns status (ok/degraded/error), db.connected, db.tables (radar_items, daily_picks_today, radar_item_analysis counts), ollama (reachable, model_available, model). Backwards compatible - all existing fields preserved. Ollama check uses 2s timeout, never crashes the endpoint."
+  }
+}

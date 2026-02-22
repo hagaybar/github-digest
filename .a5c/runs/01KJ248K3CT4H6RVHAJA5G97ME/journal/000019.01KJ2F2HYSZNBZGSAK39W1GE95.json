@@ -1,0 +1,12 @@
+{
+  "type": "EFFECT_RESOLVED",
+  "recordedAt": "2026-02-22T10:42:11.034Z",
+  "data": {
+    "effectId": "01KJ2F1QA3DJ82KHSDE0YR1VPN",
+    "status": "ok",
+    "resultRef": "tasks/01KJ2F1QA3DJ82KHSDE0YR1VPN/result.json",
+    "startedAt": "2026-02-22T10:42:11.005Z",
+    "finishedAt": "2026-02-22T10:42:11.005Z"
+  },
+  "checksum": "28b45c7a0c6b01619722b22cc177dac8a962e0963ee5b913df47e46865a70a4f"
+}

@@ -1,0 +1,14 @@
+{
+  "type": "RUN_CREATED",
+  "recordedAt": "2026-02-22T07:33:14.507Z",
+  "data": {
+    "runId": "01KJ248K3CT4H6RVHAJA5G97ME",
+    "processId": "github-digest/orchestrator-setup",
+    "entrypoint": {
+      "importPath": "../../processes/orchestrator-setup.js",
+      "exportName": "process"
+    },
+    "inputsRef": "inputs.json"
+  },
+  "checksum": "f7017b23e14cf55a0bb87bad97ca7d44df6216b599347a4b02d29ba4f64c36cf"
+}

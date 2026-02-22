@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ2EQQD3W9TT6SY0X4DBQQCN",
+  "taskId": "extend-health-endpoint",
+  "invocationKey": "github-digest/orchestrator-setup:S000004:extend-health-endpoint",
+  "stepId": "S000004",
+  "kind": "agent",
+  "title": "Extend /health endpoint",
+  "io": {
+    "inputJsonPath": "tasks/01KJ2EQQD3W9TT6SY0X4DBQQCN/input.json",
+    "outputJsonPath": "tasks/01KJ2EQQD3W9TT6SY0X4DBQQCN/output.json"
+  },
+  "inputs": {
+    "branch": "orchestrator",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

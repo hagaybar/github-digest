@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T10:41:43.768Z",
+  "data": {
+    "effectId": "01KJ2F1QA3DJ82KHSDE0YR1VPN",
+    "invocationKey": "github-digest/orchestrator-setup:S000009:commit-changes",
+    "invocationHash": "31d319f97eeb608ac6388dca6e7d792de4d9df05171814b324cb8a0625005999",
+    "stepId": "S000009",
+    "taskId": "commit-changes",
+    "kind": "agent",
+    "label": "Commit all changes",
+    "taskDefRef": "tasks/01KJ2F1QA3DJ82KHSDE0YR1VPN/task.json"
+  },
+  "checksum": "4e81da7b7b3b16d3cca594ca820d197eda8a936446a160dba1b4a1ac6a88f79c"
+}

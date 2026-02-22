@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ24BH5PG63JS418XPCXFQR6",
+  "taskId": "implement-orchestrator",
+  "invocationKey": "github-digest/orchestrator-setup:S000002:implement-orchestrator",
+  "stepId": "S000002",
+  "kind": "agent",
+  "title": "Implement orchestrate-daily command",
+  "io": {
+    "inputJsonPath": "tasks/01KJ24BH5PG63JS418XPCXFQR6/input.json",
+    "outputJsonPath": "tasks/01KJ24BH5PG63JS418XPCXFQR6/output.json"
+  },
+  "inputs": {
+    "analysisSummary": "Project is a GitHub Digest + Builder Radar pipeline. CLI has: fetch, analyze-daily, analyze-worker, rank-daily, pair-daily, serve, health, ingest-hn. run_daily_pipeline.py orchestrates all steps and spawns analyze-worker as detached subprocess. Systemd units exist for fetch/summarize/api/radar but install.sh only enables fetch+summarize timers. /health endpoint is basic (repo_count+last_fetch only). No heartbeat/stuck detection. No watchdog. No orchestrate-daily command.",
+    "branch": "orchestrator",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

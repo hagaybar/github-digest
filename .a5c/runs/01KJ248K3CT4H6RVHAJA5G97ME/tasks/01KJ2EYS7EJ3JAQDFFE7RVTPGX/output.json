@@ -1,0 +1,4 @@
+{
+  "filesCreated": ["OPERATIONS.md"],
+  "summary": "Created OPERATIONS.md with: architecture diagram, prerequisites (Ollama/llama3.2), Quick Start (dev + production), Systemd Setup (4-step: dir/venv/env/install.sh), OCI/Firewall notes (don't expose Ollama, restrict API to your IP), Verifying Operation (health/status commands, expected /health output), Log viewing, Env var overrides table, and Troubleshooting (Ollama down, stuck worker, no picks, DB errors, stale lock, uninstall)."
+}

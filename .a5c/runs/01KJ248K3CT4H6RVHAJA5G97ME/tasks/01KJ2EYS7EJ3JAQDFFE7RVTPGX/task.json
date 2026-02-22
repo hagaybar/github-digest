@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ2EYS7EJ3JAQDFFE7RVTPGX",
+  "taskId": "write-operations-docs",
+  "invocationKey": "github-digest/orchestrator-setup:S000007:write-operations-docs",
+  "stepId": "S000007",
+  "kind": "agent",
+  "title": "Write OPERATIONS.md",
+  "io": {
+    "inputJsonPath": "tasks/01KJ2EYS7EJ3JAQDFFE7RVTPGX/input.json",
+    "outputJsonPath": "tasks/01KJ2EYS7EJ3JAQDFFE7RVTPGX/output.json"
+  },
+  "inputs": {
+    "branch": "orchestrator",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T10:36:16.183Z",
+  "data": {
+    "effectId": "01KJ2EQQD3W9TT6SY0X4DBQQCN",
+    "invocationKey": "github-digest/orchestrator-setup:S000004:extend-health-endpoint",
+    "invocationHash": "94159007cec039e7b58d470342576e4b037ecf2ae8617ce824af1b3ebf85ee0b",
+    "stepId": "S000004",
+    "taskId": "extend-health-endpoint",
+    "kind": "agent",
+    "label": "Extend /health endpoint",
+    "taskDefRef": "tasks/01KJ2EQQD3W9TT6SY0X4DBQQCN/task.json"
+  },
+  "checksum": "1b8b66418f71406742156b8e156ad7d2244d896764ba729bb7c948e2de12b8e3"
+}

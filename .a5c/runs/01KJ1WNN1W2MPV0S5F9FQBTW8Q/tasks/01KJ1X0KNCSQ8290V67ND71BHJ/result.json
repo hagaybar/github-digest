@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ1X0KNCSQ8290V67ND71BHJ",
+  "taskId": "final-report",
+  "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000006:final-report",
+  "status": "ok",
+  "result": {
+    "fixesApplied": [
+      "Replaced WHERE date(last_seen_at)=today with WHERE last_seen_at >= cutoff (window-based) in _board_new, _board_updated, and _board_rising in board.py",
+      "Restarted API server to pick up the code change",
+      "Ran manual fetch — 23 repos processed, last_seen_at updated to today. Board now shows 19 new and 17 updated items"
+    ],
+    "pendingActions": [
+      "Merge 'github_radar' branch into 'main' to deploy the radar API and CLI pipeline",
+      "Create a systemd timer (OnCalendar=*-*-* 09:00:00) or crontab entry for run_daily_pipeline.py --skip-github to run the radar pipeline daily after the fetch",
+      "'rising' mode will self-heal once the fetch timer accumulates 2+ days of RepoStatsDaily rows — no code change needed",
+      "After merging, confirm db/migrations.py runs on startup to create the 5 new radar tables"
+    ],
+    "rootCauses": [
+      "board.py used an overly strict date filter (WHERE date(last_seen_at)=today) that excluded all 58 repos fetched on 2026-02-21 even though today is 2026-02-22, because the filter requires an exact today match regardless of window_days",
+      "'rising' mode shows 0 items because RepoStatsDaily has no multi-day history — star deltas need at least 2 consecutive daily fetches to compute",
+      "GitHub Radar features (ingest-hn, rank-daily, /api/today, /today routes, run_daily_pipeline.py) are only on 'github_radar' branch and never merged to 'main'. Production server runs from main so all radar endpoints return 404",
+      "No scheduler exists for the radar pipeline — even after a merge, radar data would not refresh automatically without a new timer/cron job"
+    ],
+    "summary": "The board showed 0 results because board.py compared repo timestamps with an exact today-date equality check, blocking all 58 repos fetched yesterday. This too-strict filter was replaced with a rolling window cutoff that respects the user-controllable window_days parameter; after a manual fetch the board now shows 19 new and 17 updated items. The 'rising' mode is still empty and will self-resolve as the daily fetch accumulates star-delta history over consecutive days. The GitHub Radar feature is fully built on the 'github_radar' branch with data already in the DB, but it is not deployed — it needs a branch merge, a new daily scheduler, and a decision on LLM enablement before it goes live."
+  },
+  "startedAt": "2026-02-22T05:27:22.467Z",
+  "finishedAt": "2026-02-22T05:27:22.467Z",
+  "value": {
+    "fixesApplied": [
+      "Replaced WHERE date(last_seen_at)=today with WHERE last_seen_at >= cutoff (window-based) in _board_new, _board_updated, and _board_rising in board.py",
+      "Restarted API server to pick up the code change",
+      "Ran manual fetch — 23 repos processed, last_seen_at updated to today. Board now shows 19 new and 17 updated items"
+    ],
+    "pendingActions": [
+      "Merge 'github_radar' branch into 'main' to deploy the radar API and CLI pipeline",
+      "Create a systemd timer (OnCalendar=*-*-* 09:00:00) or crontab entry for run_daily_pipeline.py --skip-github to run the radar pipeline daily after the fetch",
+      "'rising' mode will self-heal once the fetch timer accumulates 2+ days of RepoStatsDaily rows — no code change needed",
+      "After merging, confirm db/migrations.py runs on startup to create the 5 new radar tables"
+    ],
+    "rootCauses": [
+      "board.py used an overly strict date filter (WHERE date(last_seen_at)=today) that excluded all 58 repos fetched on 2026-02-21 even though today is 2026-02-22, because the filter requires an exact today match regardless of window_days",
+      "'rising' mode shows 0 items because RepoStatsDaily has no multi-day history — star deltas need at least 2 consecutive daily fetches to compute",
+      "GitHub Radar features (ingest-hn, rank-daily, /api/today, /today routes, run_daily_pipeline.py) are only on 'github_radar' branch and never merged to 'main'. Production server runs from main so all radar endpoints return 404",
+      "No scheduler exists for the radar pipeline — even after a merge, radar data would not refresh automatically without a new timer/cron job"
+    ],
+    "summary": "The board showed 0 results because board.py compared repo timestamps with an exact today-date equality check, blocking all 58 repos fetched yesterday. This too-strict filter was replaced with a rolling window cutoff that respects the user-controllable window_days parameter; after a manual fetch the board now shows 19 new and 17 updated items. The 'rising' mode is still empty and will self-resolve as the daily fetch accumulates star-delta history over consecutive days. The GitHub Radar feature is fully built on the 'github_radar' branch with data already in the DB, but it is not deployed — it needs a branch merge, a new daily scheduler, and a decision on LLM enablement before it goes live."
+  }
+}

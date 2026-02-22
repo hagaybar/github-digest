@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ1WQW0DS483C7H52V3W6YKK",
+  "taskId": "run-fetch",
+  "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000002:run-fetch",
+  "stepId": "S000002",
+  "kind": "agent",
+  "title": "Run Fetch + Summarize to Populate Board",
+  "io": {
+    "inputJsonPath": "tasks/run-fetch/input.json",
+    "outputJsonPath": "tasks/run-fetch/result.json"
+  },
+  "inputs": {
+    "diagnosis": {
+      "cronJobExists": false,
+      "cronSchedule": "",
+      "dailyPicksCount": 7,
+      "lastFetchDate": "2026-02-21",
+      "radarItemCount": 100,
+      "radarTablesExist": true,
+      "repoCount": 58,
+      "reposPassingFilter": 0,
+      "rootCauseHypotheses": [
+        "CONFIRMED CODE BUG: The board.py filter uses WHERE date(last_seen_at)=today, which is too aggressive. Even with window_days=30 set by the user in the UI, repos are invisible unless fetch ran *today*. The fix should replace the today-gate with a window_days-based cutoff (last_seen_at >= now - window_days).",
+        "Fetch timer (github-digest-fetch.timer) last ran 2026-02-21 12:00 UTC; next run is 2026-02-22 08:00 UTC. Until then, the today-gate blocks all 62 repos regardless of window_days setting.",
+        "Radar /today empty: daily_picks has 7 rows for 2026-02-21 but /api/today queries date('now')=2026-02-22. Radar pipeline (ingest-hn, rank-daily) has no scheduled job — must be run manually or added to cron.",
+        "github-digest-summarize.timer also exists (last ran 04:00 UTC today) but no radar pipeline timer exists."
+      ],
+      "timerExists": true,
+      "timerLastRun": "2026-02-21 12:00:00 UTC",
+      "todayDate": "2026-02-22"
+    },
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ2EXVAYKKVSBJYEMTDAZAJA",
+  "taskId": "update-install-script",
+  "invocationKey": "github-digest/orchestrator-setup:S000006:update-install-script",
+  "stepId": "S000006",
+  "kind": "agent",
+  "title": "Update install.sh",
+  "io": {
+    "inputJsonPath": "tasks/01KJ2EXVAYKKVSBJYEMTDAZAJA/input.json",
+    "outputJsonPath": "tasks/01KJ2EXVAYKKVSBJYEMTDAZAJA/output.json"
+  },
+  "inputs": {
+    "branch": "orchestrator",
+    "projectDir": "/home/ubuntu/projects/github-digest",
+    "systemdSummary": "Created 4 systemd units. orchestrate.service: Type=oneshot, runs 'github-digest orchestrate-daily', After=network-online.target ollama.service, ReadWritePaths=/opt/github-digest /var/log/github-digest /tmp. orchestrate.timer: OnCalendar=06:00:00 daily, Persistent=true. watchdog.service: Type=oneshot, runs 'github-digest watchdog', PrivateTmp=no (needs /tmp for PID/HB files). watchdog.timer: OnCalendar=every 10 minutes, Persistent=true."
+  }
+}

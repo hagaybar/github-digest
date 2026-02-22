@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T05:23:53.790Z",
+  "data": {
+    "effectId": "01KJ1WVR99MWN2T4RA8ZKC2R72",
+    "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000003:scheduler-diagnosis",
+    "invocationHash": "676bef1acfeabfc863771f4a95af3fcc32ed022da8815ad3e40e5400b7ec901f",
+    "stepId": "S000003",
+    "taskId": "scheduler-diagnosis",
+    "kind": "agent",
+    "label": "Scheduler Diagnosis and Fix Recommendations",
+    "taskDefRef": "tasks/01KJ1WVR99MWN2T4RA8ZKC2R72/task.json"
+  },
+  "checksum": "6d625585105f55a0304842eea973b4f09b442697fa7ac90a08faf29d5012ca14"
+}

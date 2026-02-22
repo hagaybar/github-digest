@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ248WMR1H1KBASC3EJEYY74",
+  "taskId": "branch-and-analyze",
+  "invocationKey": "github-digest/orchestrator-setup:S000001:branch-and-analyze",
+  "status": "ok",
+  "result": {
+    "existingFiles": [
+      {
+        "file": "src/github_digest/cli.py",
+        "purpose": "CLI with fetch,analyze-daily,analyze-worker,rank-daily,pair-daily,serve,health,ingest-hn"
+      },
+      {
+        "file": "src/github_digest/radar/card_generator.py",
+        "purpose": "run_analyze_worker with atomic claim, stale lock reset, per-item Ollama calls"
+      },
+      {
+        "file": "src/github_digest/api/app.py",
+        "purpose": "FastAPI: /health (basic), /api/analyze/status, /api/today, /api/build"
+      },
+      {
+        "file": "run_daily_pipeline.py",
+        "purpose": "Full pipeline: ingest->rank->queue->worker(bg)->pair, --skip-* flags"
+      },
+      {
+        "file": "deploy/systemd/install.sh",
+        "purpose": "Installs units, only enables fetch+summarize timers"
+      },
+      {
+        "file": "deploy/systemd/github-digest-radar.service",
+        "purpose": "Oneshot for run_daily_pipeline.py, NOT enabled in install.sh"
+      },
+      {
+        "file": "deploy/systemd/github-digest-radar.timer",
+        "purpose": "Daily 06:00 timer, NOT enabled in install.sh"
+      },
+      {
+        "file": "config/radar_config.yaml",
+        "purpose": "worker: max_attempts=3, timeout=300s, stale_timeout=10min"
+      }
+    ],
+    "gapsList": [
+      "No orchestrate-daily CLI command with prerequisites check + flock + worker PID guard",
+      "No orchestrate-status CLI command",
+      "No watchdog CLI command",
+      "No worker heartbeat file (stuck detection impossible)",
+      "/health endpoint missing Ollama check and radar table counts",
+      "install.sh missing: radar timer, api service enablement, watchdog units",
+      "No watchdog systemd service+timer",
+      "No OPERATIONS.md"
+    ],
+    "summary": "Project is a GitHub Digest + Builder Radar pipeline. CLI has: fetch, analyze-daily, analyze-worker, rank-daily, pair-daily, serve, health, ingest-hn. run_daily_pipeline.py orchestrates all steps and spawns analyze-worker as detached subprocess. Systemd units exist for fetch/summarize/api/radar but install.sh only enables fetch+summarize timers. /health endpoint is basic (repo_count+last_fetch only). No heartbeat/stuck detection. No watchdog. No orchestrate-daily command."
+  },
+  "startedAt": "2026-02-22T07:34:47.614Z",
+  "finishedAt": "2026-02-22T07:34:47.614Z",
+  "value": {
+    "existingFiles": [
+      {
+        "file": "src/github_digest/cli.py",
+        "purpose": "CLI with fetch,analyze-daily,analyze-worker,rank-daily,pair-daily,serve,health,ingest-hn"
+      },
+      {
+        "file": "src/github_digest/radar/card_generator.py",
+        "purpose": "run_analyze_worker with atomic claim, stale lock reset, per-item Ollama calls"
+      },
+      {
+        "file": "src/github_digest/api/app.py",
+        "purpose": "FastAPI: /health (basic), /api/analyze/status, /api/today, /api/build"
+      },
+      {
+        "file": "run_daily_pipeline.py",
+        "purpose": "Full pipeline: ingest->rank->queue->worker(bg)->pair, --skip-* flags"
+      },
+      {
+        "file": "deploy/systemd/install.sh",
+        "purpose": "Installs units, only enables fetch+summarize timers"
+      },
+      {
+        "file": "deploy/systemd/github-digest-radar.service",
+        "purpose": "Oneshot for run_daily_pipeline.py, NOT enabled in install.sh"
+      },
+      {
+        "file": "deploy/systemd/github-digest-radar.timer",
+        "purpose": "Daily 06:00 timer, NOT enabled in install.sh"
+      },
+      {
+        "file": "config/radar_config.yaml",
+        "purpose": "worker: max_attempts=3, timeout=300s, stale_timeout=10min"
+      }
+    ],
+    "gapsList": [
+      "No orchestrate-daily CLI command with prerequisites check + flock + worker PID guard",
+      "No orchestrate-status CLI command",
+      "No watchdog CLI command",
+      "No worker heartbeat file (stuck detection impossible)",
+      "/health endpoint missing Ollama check and radar table counts",
+      "install.sh missing: radar timer, api service enablement, watchdog units",
+      "No watchdog systemd service+timer",
+      "No OPERATIONS.md"
+    ],
+    "summary": "Project is a GitHub Digest + Builder Radar pipeline. CLI has: fetch, analyze-daily, analyze-worker, rank-daily, pair-daily, serve, health, ingest-hn. run_daily_pipeline.py orchestrates all steps and spawns analyze-worker as detached subprocess. Systemd units exist for fetch/summarize/api/radar but install.sh only enables fetch+summarize timers. /health endpoint is basic (repo_count+last_fetch only). No heartbeat/stuck detection. No watchdog. No orchestrate-daily command."
+  }
+}

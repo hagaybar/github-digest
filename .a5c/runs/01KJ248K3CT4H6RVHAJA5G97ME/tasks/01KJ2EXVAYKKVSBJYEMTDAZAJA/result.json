@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ2EXVAYKKVSBJYEMTDAZAJA",
+  "taskId": "update-install-script",
+  "invocationKey": "github-digest/orchestrator-setup:S000006:update-install-script",
+  "status": "ok",
+  "result": {
+    "filesCreated": [
+      "deploy/systemd/install.sh (modified)",
+      "deploy/systemd/uninstall.sh (modified)"
+    ],
+    "summary": "Updated install.sh: now installs all 9 unit files (fetch, summarize, api, orchestrate, watchdog service+timer each). Enables and starts github-digest-api.service, github-digest-orchestrate.timer, github-digest-watchdog.timer in addition to existing fetch/summarize timers. Creates /var/log/github-digest with proper ownership. Updated uninstall.sh: now stops/disables/removes orchestrate and watchdog units in addition to existing ones."
+  },
+  "startedAt": "2026-02-22T10:40:04.963Z",
+  "finishedAt": "2026-02-22T10:40:04.963Z",
+  "value": {
+    "filesCreated": [
+      "deploy/systemd/install.sh (modified)",
+      "deploy/systemd/uninstall.sh (modified)"
+    ],
+    "summary": "Updated install.sh: now installs all 9 unit files (fetch, summarize, api, orchestrate, watchdog service+timer each). Enables and starts github-digest-api.service, github-digest-orchestrate.timer, github-digest-watchdog.timer in addition to existing fetch/summarize timers. Creates /var/log/github-digest with proper ownership. Updated uninstall.sh: now stops/disables/removes orchestrate and watchdog units in addition to existing ones."
+  }
+}

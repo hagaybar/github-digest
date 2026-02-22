@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ1ZEBSCDB00GE7T6Y9Q8D09",
+  "taskId": "qa-verify",
+  "invocationKey": "github-digest/unified-page:S000004:qa-verify",
+  "stepId": "S000004",
+  "kind": "agent",
+  "title": "QA — Verify All Tabs",
+  "io": {
+    "inputJsonPath": "tasks/01KJ1ZEBSCDB00GE7T6Y9Q8D09/input.json",
+    "outputJsonPath": "tasks/01KJ1ZEBSCDB00GE7T6Y9Q8D09/result.json"
+  },
+  "inputs": {
+    "pipeline": {
+      "analysisCount": 7,
+      "apiBuildCount": 0,
+      "apiTodayCount": 7,
+      "dailyPicksCount": 7,
+      "error": "4/7 items have LLM analysis (3 failed JSON parse - llama3.2 timeout/malformed JSON). Pairings=0 (pairing engine needs GitHub-linked items with full analysis). Timeout raised to 180s in card_generator.py.",
+      "llmAnalysisWorked": true,
+      "pairingsCount": 0,
+      "pipelineRun": true,
+      "pipelineSteps": [
+        "ingest-hn",
+        "rank-daily",
+        "analyze-daily",
+        "pair-daily"
+      ],
+      "serverRestarted": true
+    },
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

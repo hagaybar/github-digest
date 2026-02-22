@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T10:39:36.821Z",
+  "data": {
+    "effectId": "01KJ2EXVAYKKVSBJYEMTDAZAJA",
+    "invocationKey": "github-digest/orchestrator-setup:S000006:update-install-script",
+    "invocationHash": "477df5bb4b04f53199318238e423326167e6653f52c9d9a1e946e954f2a06486",
+    "stepId": "S000006",
+    "taskId": "update-install-script",
+    "kind": "agent",
+    "label": "Update install.sh",
+    "taskDefRef": "tasks/01KJ2EXVAYKKVSBJYEMTDAZAJA/task.json"
+  },
+  "checksum": "6964ddde84f6c5588f4e917a89e5d8039964e8a90a606288b8a44f7d34674ece"
+}

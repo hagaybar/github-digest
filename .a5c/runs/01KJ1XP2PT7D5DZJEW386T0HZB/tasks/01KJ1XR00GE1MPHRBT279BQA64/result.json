@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ1XR00GE1MPHRBT279BQA64",
+  "taskId": "build-unified-page",
+  "invocationKey": "github-digest/unified-page:S000002:build-unified-page",
+  "status": "ok",
+  "result": {
+    "appPyChanged": false,
+    "filesModified": [
+      "src/github_digest/web/templates/index.html"
+    ],
+    "implementationNotes": "Unified three-tab index.html (1068 lines). Tab 1=Digest Board (all original JS preserved), Tab 2=Today's 7 (/api/today), Tab 3=Build Pairings (/api/build). URL hash routing, lazy loading, consistent earth-tone design.",
+    "indexHtmlLines": 1068,
+    "issues": []
+  },
+  "startedAt": "2026-02-22T05:42:28.014Z",
+  "finishedAt": "2026-02-22T05:42:28.014Z",
+  "value": {
+    "appPyChanged": false,
+    "filesModified": [
+      "src/github_digest/web/templates/index.html"
+    ],
+    "implementationNotes": "Unified three-tab index.html (1068 lines). Tab 1=Digest Board (all original JS preserved), Tab 2=Today's 7 (/api/today), Tab 3=Build Pairings (/api/build). URL hash routing, lazy loading, consistent earth-tone design.",
+    "indexHtmlLines": 1068,
+    "issues": []
+  }
+}

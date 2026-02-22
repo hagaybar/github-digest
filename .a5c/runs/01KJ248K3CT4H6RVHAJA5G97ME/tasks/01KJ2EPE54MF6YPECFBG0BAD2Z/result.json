@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ2EPE54MF6YPECFBG0BAD2Z",
+  "taskId": "implement-heartbeat",
+  "invocationKey": "github-digest/orchestrator-setup:S000003:implement-heartbeat",
+  "status": "ok",
+  "result": {
+    "filesCreated": [
+      "src/github_digest/radar/card_generator.py (modified)"
+    ],
+    "summary": "Added write_heartbeat() calls inside run_analyze_worker() in card_generator.py: called after item claim (before Ollama) and after each complete/fail. orchestrator.py already contains check_worker_stuck(), write_heartbeat(), restart_stuck_worker(), run_watchdog(). watchdog CLI command already registered in cli.py."
+  },
+  "startedAt": "2026-02-22T10:36:11.805Z",
+  "finishedAt": "2026-02-22T10:36:11.805Z",
+  "value": {
+    "filesCreated": [
+      "src/github_digest/radar/card_generator.py (modified)"
+    ],
+    "summary": "Added write_heartbeat() calls inside run_analyze_worker() in card_generator.py: called after item claim (before Ollama) and after each complete/fail. orchestrator.py already contains check_worker_stuck(), write_heartbeat(), restart_stuck_worker(), run_watchdog(). watchdog CLI command already registered in cli.py."
+  }
+}

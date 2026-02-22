@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ2ERRM0N5EFR4XBZMYV7JVE",
+  "taskId": "create-systemd-units",
+  "invocationKey": "github-digest/orchestrator-setup:S000005:create-systemd-units",
+  "status": "ok",
+  "result": {
+    "filesCreated": [
+      "deploy/systemd/github-digest-orchestrate.service",
+      "deploy/systemd/github-digest-orchestrate.timer",
+      "deploy/systemd/github-digest-watchdog.service",
+      "deploy/systemd/github-digest-watchdog.timer"
+    ],
+    "summary": "Created 4 systemd units. orchestrate.service: Type=oneshot, runs 'github-digest orchestrate-daily', After=network-online.target ollama.service, ReadWritePaths=/opt/github-digest /var/log/github-digest /tmp. orchestrate.timer: OnCalendar=06:00:00 daily, Persistent=true. watchdog.service: Type=oneshot, runs 'github-digest watchdog', PrivateTmp=no (needs /tmp for PID/HB files). watchdog.timer: OnCalendar=every 10 minutes, Persistent=true."
+  },
+  "startedAt": "2026-02-22T10:39:33.967Z",
+  "finishedAt": "2026-02-22T10:39:33.967Z",
+  "value": {
+    "filesCreated": [
+      "deploy/systemd/github-digest-orchestrate.service",
+      "deploy/systemd/github-digest-orchestrate.timer",
+      "deploy/systemd/github-digest-watchdog.service",
+      "deploy/systemd/github-digest-watchdog.timer"
+    ],
+    "summary": "Created 4 systemd units. orchestrate.service: Type=oneshot, runs 'github-digest orchestrate-daily', After=network-online.target ollama.service, ReadWritePaths=/opt/github-digest /var/log/github-digest /tmp. orchestrate.timer: OnCalendar=06:00:00 daily, Persistent=true. watchdog.service: Type=oneshot, runs 'github-digest watchdog', PrivateTmp=no (needs /tmp for PID/HB files). watchdog.timer: OnCalendar=every 10 minutes, Persistent=true."
+  }
+}

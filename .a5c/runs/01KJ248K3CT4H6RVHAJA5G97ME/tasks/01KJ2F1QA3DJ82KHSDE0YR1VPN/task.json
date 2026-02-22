@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ2F1QA3DJ82KHSDE0YR1VPN",
+  "taskId": "commit-changes",
+  "invocationKey": "github-digest/orchestrator-setup:S000009:commit-changes",
+  "stepId": "S000009",
+  "kind": "agent",
+  "title": "Commit all changes",
+  "io": {
+    "inputJsonPath": "tasks/01KJ2F1QA3DJ82KHSDE0YR1VPN/input.json",
+    "outputJsonPath": "tasks/01KJ2F1QA3DJ82KHSDE0YR1VPN/output.json"
+  },
+  "inputs": {
+    "branch": "orchestrator",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

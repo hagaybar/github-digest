@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T05:21:46.529Z",
+  "data": {
+    "effectId": "01KJ1WQW0DS483C7H52V3W6YKK",
+    "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000002:run-fetch",
+    "invocationHash": "af0d4f029dfb7ced5ac5ef6a191032b6be1cb9a02806f1f1e01f1dc554e3b32d",
+    "stepId": "S000002",
+    "taskId": "run-fetch",
+    "kind": "agent",
+    "label": "Run Fetch + Summarize to Populate Board",
+    "taskDefRef": "tasks/01KJ1WQW0DS483C7H52V3W6YKK/task.json"
+  },
+  "checksum": "dc25793b879aea31b70be4bbcd3da1975ef2c89bd7b0109919ecf8bafdc7e0de"
+}

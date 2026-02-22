@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ1X0KNCSQ8290V67ND71BHJ",
+  "taskId": "final-report",
+  "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000006:final-report",
+  "stepId": "S000006",
+  "kind": "agent",
+  "title": "Final Root Cause Report",
+  "io": {
+    "inputJsonPath": "tasks/final-report/input.json",
+    "outputJsonPath": "tasks/final-report/result.json"
+  },
+  "inputs": {
+    "diagnosis": {
+      "cronJobExists": false,
+      "cronSchedule": "",
+      "dailyPicksCount": 7,
+      "lastFetchDate": "2026-02-21",
+      "radarItemCount": 100,
+      "radarTablesExist": true,
+      "repoCount": 58,
+      "reposPassingFilter": 0,
+      "rootCauseHypotheses": [
+        "CONFIRMED CODE BUG: The board.py filter uses WHERE date(last_seen_at)=today, which is too aggressive. Even with window_days=30 set by the user in the UI, repos are invisible unless fetch ran *today*. The fix should replace the today-gate with a window_days-based cutoff (last_seen_at >= now - window_days).",
+        "Fetch timer (github-digest-fetch.timer) last ran 2026-02-21 12:00 UTC; next run is 2026-02-22 08:00 UTC. Until then, the today-gate blocks all 62 repos regardless of window_days setting.",
+        "Radar /today empty: daily_picks has 7 rows for 2026-02-21 but /api/today queries date('now')=2026-02-22. Radar pipeline (ingest-hn, rank-daily) has no scheduled job — must be run manually or added to cron.",
+        "github-digest-summarize.timer also exists (last ran 04:00 UTC today) but no radar pipeline timer exists."
+      ],
+      "timerExists": true,
+      "timerLastRun": "2026-02-21 12:00:00 UTC",
+      "todayDate": "2026-02-22"
+    },
+    "fetchFix": {
+      "boardNowShowingData": true,
+      "boardSampleItem": "yichuan-w/LEANN",
+      "codeFix": {
+        "applied": true,
+        "changesDescription": "_board_new, _board_updated, _board_rising: replaced .where(func.date(RepoSearch.last_seen_at)==today) with .where(RepoSearch.last_seen_at>=cutoff). Server restarted.",
+        "serverRestarted": true
+      },
+      "error": "",
+      "fetchOutput": "2026-02-22 05:22:47 INFO Fetch result: {'status': 'finished', 'processed': 23}",
+      "fetchSuccess": true,
+      "reposUpdatedToday": 23
+    },
+    "radarFix": {
+      "apiTodayResponse": "{\"detail\":\"Not Found\"}",
+      "currentBranch": "main",
+      "dailyPicksCount": 0,
+      "error": "Radar pipeline (run_daily_pipeline.py, ingest-hn, rank-daily, pair-daily CLI commands, /api/today route) is on 'github_radar' branch only. Main branch has none of it. /api/today returns 404. Daily picks only exist for 2026-02-21, not today.",
+      "pipelineAvailable": false,
+      "pipelineRun": false,
+      "pipelineSuccess": false,
+      "radarItemsCount": 100,
+      "stepsRun": []
+    },
+    "schedulerFix": {
+      "cronEntries": [],
+      "cronExists": false,
+      "fetchTimerSchedule": "daily at 08:00 UTC (OnCalendar=*-*-* 08:00:00)",
+      "lastScheduledRun": "2026-02-21T12:00:00Z (Persistent=true caused late fire after missed 08:00 window)",
+      "radarTimerExists": false,
+      "recommendedFix": "1. Merge or deploy github_radar branch. 2. Create github-digest-radar.service + github-digest-radar.timer (OnCalendar=*-*-* 09:00:00, one hour after fetch). 3. systemctl daemon-reload && systemctl enable --now github-digest-radar.timer",
+      "schedulerRootCause": "GitHub Radar pipeline (ingest-hn, rank-daily, etc.) lives on 'github_radar' branch only. No systemd unit or crontab exists for it. The installed systemd units only cover fetch and summarize on main branch.",
+      "suggestedCrontab": "# Daily fetch (08:00 UTC)\n0 8 * * * cd /opt/github-digest && flock -n /tmp/gd-fetch.lock .venv/bin/github-digest fetch >> /var/log/github-digest/fetch.log 2>&1\n# Radar pipeline (09:00 UTC, after fetch)\n0 9 * * * cd /opt/github-digest && flock -n /tmp/gd-radar.lock .venv/bin/python3 run_daily_pipeline.py --skip-github >> /var/log/github-digest/radar.log 2>&1",
+      "timerExists": true,
+      "timerStatus": "active"
+    },
+    "verification": {
+      "allFixed": false,
+      "boardFilterFixed": true,
+      "healthRepoCount": 58,
+      "lastFetch": "2026-02-22T05:22:47.995769",
+      "mainBoardFixed": true,
+      "mainBoardNewCount": 19,
+      "mainBoardRisingCount": 0,
+      "mainBoardUpdatedCount": 17,
+      "notes": "Main board showing data: 19 items (new), 17 items (updated). Rising=0 because RepoStatsDaily lacks multi-day history. board.py code fix confirmed: last_seen_at >= cutoff at lines 175, 220, 297. Radar routes not on main branch.",
+      "uiAccessible": true
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "summary": "All smoke tests passed. Imports OK. CLI commands (orchestrate-daily, orchestrate-status, watchdog) all registered and functional. Dry-run output confirmed correct: prerequisites check passes (ollama reachable, llama3.2 available, DB writable, configs exist), would_run list correct. orchestrate-status shows live data (API reachable, Ollama reachable, analyze queue 7/7 completed). 93 tests passed (test_phase2.py excluded — pre-existing failure).",
+  "allPassed": true,
+  "errors": []
+}

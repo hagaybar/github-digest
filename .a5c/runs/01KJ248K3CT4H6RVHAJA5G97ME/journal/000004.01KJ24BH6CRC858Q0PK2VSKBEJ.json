@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T07:34:50.828Z",
+  "data": {
+    "effectId": "01KJ24BH5PG63JS418XPCXFQR6",
+    "invocationKey": "github-digest/orchestrator-setup:S000002:implement-orchestrator",
+    "invocationHash": "1034bc11c3932c8a7d9a4729e59abe07269444774fac310628e98a927b086ead",
+    "stepId": "S000002",
+    "taskId": "implement-orchestrator",
+    "kind": "agent",
+    "label": "Implement orchestrate-daily command",
+    "taskDefRef": "tasks/01KJ24BH5PG63JS418XPCXFQR6/task.json"
+  },
+  "checksum": "5e7ded8471b7cbc9c0bbeca8e88db79ccf9f98f05654fd41f1df842304f631c9"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T10:40:07.426Z",
+  "data": {
+    "effectId": "01KJ2EYS7EJ3JAQDFFE7RVTPGX",
+    "invocationKey": "github-digest/orchestrator-setup:S000007:write-operations-docs",
+    "invocationHash": "6b1b552a27672b145bc561d06a215db20648ed5a8233a5258e0d474f6b728238",
+    "stepId": "S000007",
+    "taskId": "write-operations-docs",
+    "kind": "agent",
+    "label": "Write OPERATIONS.md",
+    "taskDefRef": "tasks/01KJ2EYS7EJ3JAQDFFE7RVTPGX/task.json"
+  },
+  "checksum": "a0acd360868b9b00f7a510042e0eccb275b89186e82c29b98e64da0ee1334ea6"
+}

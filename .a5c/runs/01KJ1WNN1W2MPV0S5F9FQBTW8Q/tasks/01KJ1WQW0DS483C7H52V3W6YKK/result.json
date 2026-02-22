@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ1WQW0DS483C7H52V3W6YKK",
+  "taskId": "run-fetch",
+  "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000002:run-fetch",
+  "status": "ok",
+  "result": {
+    "boardNowShowingData": true,
+    "boardSampleItem": "yichuan-w/LEANN",
+    "codeFix": {
+      "applied": true,
+      "changesDescription": "_board_new, _board_updated, _board_rising: replaced .where(func.date(RepoSearch.last_seen_at)==today) with .where(RepoSearch.last_seen_at>=cutoff). Server restarted.",
+      "serverRestarted": true
+    },
+    "error": "",
+    "fetchOutput": "2026-02-22 05:22:47 INFO Fetch result: {'status': 'finished', 'processed': 23}",
+    "fetchSuccess": true,
+    "reposUpdatedToday": 23
+  },
+  "startedAt": "2026-02-22T05:23:49.149Z",
+  "finishedAt": "2026-02-22T05:23:49.149Z",
+  "value": {
+    "boardNowShowingData": true,
+    "boardSampleItem": "yichuan-w/LEANN",
+    "codeFix": {
+      "applied": true,
+      "changesDescription": "_board_new, _board_updated, _board_rising: replaced .where(func.date(RepoSearch.last_seen_at)==today) with .where(RepoSearch.last_seen_at>=cutoff). Server restarted.",
+      "serverRestarted": true
+    },
+    "error": "",
+    "fetchOutput": "2026-02-22 05:22:47 INFO Fetch result: {'status': 'finished', 'processed': 23}",
+    "fetchSuccess": true,
+    "reposUpdatedToday": 23
+  }
+}

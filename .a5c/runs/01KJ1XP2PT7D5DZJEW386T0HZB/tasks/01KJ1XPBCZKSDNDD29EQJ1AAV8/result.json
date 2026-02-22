@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ1XPBCZKSDNDD29EQJ1AAV8",
+  "taskId": "merge-radar-branch",
+  "invocationKey": "github-digest/unified-page:S000001:merge-radar-branch",
+  "status": "ok",
+  "result": {
+    "commitHash": "67c9e12",
+    "conflictsResolved": [],
+    "error": "",
+    "importsWorking": true,
+    "llmEnabled": true,
+    "mergeSuccess": true
+  },
+  "startedAt": "2026-02-22T05:39:15.094Z",
+  "finishedAt": "2026-02-22T05:39:15.094Z",
+  "value": {
+    "commitHash": "67c9e12",
+    "conflictsResolved": [],
+    "error": "",
+    "importsWorking": true,
+    "llmEnabled": true,
+    "mergeSuccess": true
+  }
+}

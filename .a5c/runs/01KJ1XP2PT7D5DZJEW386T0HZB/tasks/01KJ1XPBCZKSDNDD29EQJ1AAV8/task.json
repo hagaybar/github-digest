@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ1XPBCZKSDNDD29EQJ1AAV8",
+  "taskId": "merge-radar-branch",
+  "invocationKey": "github-digest/unified-page:S000001:merge-radar-branch",
+  "stepId": "S000001",
+  "kind": "agent",
+  "title": "Merge github_radar → main + Enable LLM",
+  "io": {
+    "inputJsonPath": "tasks/merge-radar-branch/input.json",
+    "outputJsonPath": "tasks/merge-radar-branch/result.json"
+  },
+  "inputs": {
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

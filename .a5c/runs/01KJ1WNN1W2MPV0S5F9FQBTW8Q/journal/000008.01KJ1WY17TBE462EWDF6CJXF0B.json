@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T05:25:08.474Z",
+  "data": {
+    "effectId": "01KJ1WY175S8EZ185TY0JHWPN4",
+    "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000004:radar-pipeline",
+    "invocationHash": "80b25afe2ef1a8aa39706b4012e19a3cb064d7e905e82da6ef725b79b04039f9",
+    "stepId": "S000004",
+    "taskId": "radar-pipeline",
+    "kind": "agent",
+    "label": "Run GitHub Radar Pipeline",
+    "taskDefRef": "tasks/01KJ1WY175S8EZ185TY0JHWPN4/task.json"
+  },
+  "checksum": "7765506451c39bd8d3167b3a4eb14aaaaf62805126a0cdbba1704f46a28e4498"
+}

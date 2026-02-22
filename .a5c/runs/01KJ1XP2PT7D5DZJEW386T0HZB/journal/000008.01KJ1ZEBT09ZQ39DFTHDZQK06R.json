@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T06:09:00.737Z",
+  "data": {
+    "effectId": "01KJ1ZEBSCDB00GE7T6Y9Q8D09",
+    "invocationKey": "github-digest/unified-page:S000004:qa-verify",
+    "invocationHash": "082901325c1822480f6e29e39e4e7b4ed582a77e0c80470cd1b5ff5a5fbb4534",
+    "stepId": "S000004",
+    "taskId": "qa-verify",
+    "kind": "agent",
+    "label": "QA — Verify All Tabs",
+    "taskDefRef": "tasks/01KJ1ZEBSCDB00GE7T6Y9Q8D09/task.json"
+  },
+  "checksum": "1486a6625702ff5db1a27e528b5cee2f134ade6c23d3a2f92612cf4c922c412d"
+}

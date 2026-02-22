@@ -1,0 +1,13 @@
+{
+  "runId": "01KJ1WNN1W2MPV0S5F9FQBTW8Q",
+  "request": "github-digest/diagnose-and-fix-empty-board",
+  "processId": "github-digest/diagnose-and-fix-empty-board",
+  "entrypoint": {
+    "importPath": "../../processes/diagnose-and-fix-empty-board.js",
+    "exportName": "process"
+  },
+  "processPath": "../../processes/diagnose-and-fix-empty-board.js",
+  "layoutVersion": "2026.01-storage-preview",
+  "createdAt": "2026-02-22T05:20:33.870Z",
+  "completionSecret": "af1d619bb18f8f28dec59a6c5162002e"
+}

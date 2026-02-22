@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ1WZB56KZDHDF0XMH6V5N6A",
+  "taskId": "verify-fixes",
+  "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000005:verify-fixes",
+  "stepId": "S000005",
+  "kind": "agent",
+  "title": "Verify All Fixes",
+  "io": {
+    "inputJsonPath": "tasks/verify-fixes/input.json",
+    "outputJsonPath": "tasks/verify-fixes/result.json"
+  },
+  "inputs": {
+    "fetchFix": {
+      "boardNowShowingData": true,
+      "boardSampleItem": "yichuan-w/LEANN",
+      "codeFix": {
+        "applied": true,
+        "changesDescription": "_board_new, _board_updated, _board_rising: replaced .where(func.date(RepoSearch.last_seen_at)==today) with .where(RepoSearch.last_seen_at>=cutoff). Server restarted.",
+        "serverRestarted": true
+      },
+      "error": "",
+      "fetchOutput": "2026-02-22 05:22:47 INFO Fetch result: {'status': 'finished', 'processed': 23}",
+      "fetchSuccess": true,
+      "reposUpdatedToday": 23
+    },
+    "projectDir": "/home/ubuntu/projects/github-digest",
+    "radarFix": {
+      "apiTodayResponse": "{\"detail\":\"Not Found\"}",
+      "currentBranch": "main",
+      "dailyPicksCount": 0,
+      "error": "Radar pipeline (run_daily_pipeline.py, ingest-hn, rank-daily, pair-daily CLI commands, /api/today route) is on 'github_radar' branch only. Main branch has none of it. /api/today returns 404. Daily picks only exist for 2026-02-21, not today.",
+      "pipelineAvailable": false,
+      "pipelineRun": false,
+      "pipelineSuccess": false,
+      "radarItemsCount": 100,
+      "stepsRun": []
+    }
+  }
+}

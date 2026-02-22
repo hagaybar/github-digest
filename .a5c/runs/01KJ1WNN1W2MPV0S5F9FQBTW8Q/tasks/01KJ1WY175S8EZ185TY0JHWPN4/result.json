@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ1WY175S8EZ185TY0JHWPN4",
+  "taskId": "radar-pipeline",
+  "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000004:radar-pipeline",
+  "status": "ok",
+  "result": {
+    "apiTodayResponse": "{\"detail\":\"Not Found\"}",
+    "currentBranch": "main",
+    "dailyPicksCount": 0,
+    "error": "Radar pipeline (run_daily_pipeline.py, ingest-hn, rank-daily, pair-daily CLI commands, /api/today route) is on 'github_radar' branch only. Main branch has none of it. /api/today returns 404. Daily picks only exist for 2026-02-21, not today.",
+    "pipelineAvailable": false,
+    "pipelineRun": false,
+    "pipelineSuccess": false,
+    "radarItemsCount": 100,
+    "stepsRun": []
+  },
+  "startedAt": "2026-02-22T05:25:47.686Z",
+  "finishedAt": "2026-02-22T05:25:47.686Z",
+  "value": {
+    "apiTodayResponse": "{\"detail\":\"Not Found\"}",
+    "currentBranch": "main",
+    "dailyPicksCount": 0,
+    "error": "Radar pipeline (run_daily_pipeline.py, ingest-hn, rank-daily, pair-daily CLI commands, /api/today route) is on 'github_radar' branch only. Main branch has none of it. /api/today returns 404. Daily picks only exist for 2026-02-21, not today.",
+    "pipelineAvailable": false,
+    "pipelineRun": false,
+    "pipelineSuccess": false,
+    "radarItemsCount": 100,
+    "stepsRun": []
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T05:38:25.334Z",
+  "data": {
+    "effectId": "01KJ1XPBCZKSDNDD29EQJ1AAV8",
+    "invocationKey": "github-digest/unified-page:S000001:merge-radar-branch",
+    "invocationHash": "c311cf9df28b91a05008c3e701906de47b8f1b757ce8e54d007cc54b909d7ede",
+    "stepId": "S000001",
+    "taskId": "merge-radar-branch",
+    "kind": "agent",
+    "label": "Merge github_radar → main + Enable LLM",
+    "taskDefRef": "tasks/01KJ1XPBCZKSDNDD29EQJ1AAV8/task.json"
+  },
+  "checksum": "122caf30ea6cf25b7c091aa45849ff14b3091f71ed09c38db437a5831505e65a"
+}

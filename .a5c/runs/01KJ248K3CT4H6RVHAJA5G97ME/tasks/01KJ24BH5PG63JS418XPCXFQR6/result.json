@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ24BH5PG63JS418XPCXFQR6",
+  "taskId": "implement-orchestrator",
+  "invocationKey": "github-digest/orchestrator-setup:S000002:implement-orchestrator",
+  "status": "ok",
+  "result": {
+    "filesCreated": [
+      "src/github_digest/services/orchestrator.py",
+      "src/github_digest/cli.py (modified)"
+    ],
+    "summary": "Created src/github_digest/services/orchestrator.py with: run_orchestrate_daily() (prerequisites check, flock, worker PID guard, ordered pipeline steps), get_orchestrate_status() (API/Ollama/worker/queue status), run_watchdog() (health check + stuck detection + restart), check_worker_running(), check_worker_stuck(), write_heartbeat(), restart_stuck_worker(). Added orchestrate-daily, orchestrate-status, watchdog subcommands to cli.py. All imports verified OK."
+  },
+  "startedAt": "2026-02-22T10:35:31.184Z",
+  "finishedAt": "2026-02-22T10:35:31.184Z",
+  "value": {
+    "filesCreated": [
+      "src/github_digest/services/orchestrator.py",
+      "src/github_digest/cli.py (modified)"
+    ],
+    "summary": "Created src/github_digest/services/orchestrator.py with: run_orchestrate_daily() (prerequisites check, flock, worker PID guard, ordered pipeline steps), get_orchestrate_status() (API/Ollama/worker/queue status), run_watchdog() (health check + stuck detection + restart), check_worker_running(), check_worker_stuck(), write_heartbeat(), restart_stuck_worker(). Added orchestrate-daily, orchestrate-status, watchdog subcommands to cli.py. All imports verified OK."
+  }
+}

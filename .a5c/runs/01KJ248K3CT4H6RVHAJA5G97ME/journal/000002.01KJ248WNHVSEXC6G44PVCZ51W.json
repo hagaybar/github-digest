@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T07:33:24.273Z",
+  "data": {
+    "effectId": "01KJ248WMR1H1KBASC3EJEYY74",
+    "invocationKey": "github-digest/orchestrator-setup:S000001:branch-and-analyze",
+    "invocationHash": "38b5175b9744d6038df843f1ab27ef9792b7ea458541172b38a5ff59e92c1ac3",
+    "stepId": "S000001",
+    "taskId": "branch-and-analyze",
+    "kind": "agent",
+    "label": "Create branch and analyze codebase",
+    "taskDefRef": "tasks/01KJ248WMR1H1KBASC3EJEYY74/task.json"
+  },
+  "checksum": "4fe6e9ea50cbc3f7ee38580f01382d3ddea78a6fcb33d42b2ec5d6f75fe372ad"
+}

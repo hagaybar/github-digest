@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ2EPE54MF6YPECFBG0BAD2Z",
+  "taskId": "implement-heartbeat",
+  "invocationKey": "github-digest/orchestrator-setup:S000003:implement-heartbeat",
+  "stepId": "S000003",
+  "kind": "agent",
+  "title": "Worker heartbeat + stuck detection",
+  "io": {
+    "inputJsonPath": "tasks/01KJ2EPE54MF6YPECFBG0BAD2Z/input.json",
+    "outputJsonPath": "tasks/01KJ2EPE54MF6YPECFBG0BAD2Z/output.json"
+  },
+  "inputs": {
+    "branch": "orchestrator",
+    "orchestratorSummary": "Created src/github_digest/services/orchestrator.py with: run_orchestrate_daily() (prerequisites check, flock, worker PID guard, ordered pipeline steps), get_orchestrate_status() (API/Ollama/worker/queue status), run_watchdog() (health check + stuck detection + restart), check_worker_running(), check_worker_stuck(), write_heartbeat(), restart_stuck_worker(). Added orchestrate-daily, orchestrate-status, watchdog subcommands to cli.py. All imports verified OK.",
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

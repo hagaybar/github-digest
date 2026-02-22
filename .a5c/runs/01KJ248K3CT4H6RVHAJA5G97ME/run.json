@@ -1,0 +1,13 @@
+{
+  "runId": "01KJ248K3CT4H6RVHAJA5G97ME",
+  "request": "github-digest/orchestrator-setup",
+  "processId": "github-digest/orchestrator-setup",
+  "entrypoint": {
+    "importPath": "../../processes/orchestrator-setup.js",
+    "exportName": "process"
+  },
+  "processPath": "../../processes/orchestrator-setup.js",
+  "layoutVersion": "2026.01-storage-preview",
+  "createdAt": "2026-02-22T07:33:14.493Z",
+  "completionSecret": "400f06276eaf5fcbe54206d6d20ad6d8"
+}

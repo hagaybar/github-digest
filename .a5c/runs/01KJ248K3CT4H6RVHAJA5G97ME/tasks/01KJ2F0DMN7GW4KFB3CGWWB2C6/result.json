@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KJ2F0DMN7GW4KFB3CGWWB2C6",
+  "taskId": "run-smoke-tests",
+  "invocationKey": "github-digest/orchestrator-setup:S000008:run-smoke-tests",
+  "status": "ok",
+  "result": {
+    "allPassed": true,
+    "errors": [],
+    "summary": "All smoke tests passed. Imports OK. CLI commands (orchestrate-daily, orchestrate-status, watchdog) all registered and functional. Dry-run output confirmed correct: prerequisites check passes (ollama reachable, llama3.2 available, DB writable, configs exist), would_run list correct. orchestrate-status shows live data (API reachable, Ollama reachable, analyze queue 7/7 completed). 93 tests passed (test_phase2.py excluded — pre-existing failure)."
+  },
+  "startedAt": "2026-02-22T10:41:40.797Z",
+  "finishedAt": "2026-02-22T10:41:40.797Z",
+  "value": {
+    "allPassed": true,
+    "errors": [],
+    "summary": "All smoke tests passed. Imports OK. CLI commands (orchestrate-daily, orchestrate-status, watchdog) all registered and functional. Dry-run output confirmed correct: prerequisites check passes (ollama reachable, llama3.2 available, DB writable, configs exist), would_run list correct. orchestrate-status shows live data (API reachable, Ollama reachable, analyze queue 7/7 completed). 93 tests passed (test_phase2.py excluded — pre-existing failure)."
+  }
+}

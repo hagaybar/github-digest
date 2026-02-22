@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KJ1XR00GE1MPHRBT279BQA64",
+  "taskId": "build-unified-page",
+  "invocationKey": "github-digest/unified-page:S000002:build-unified-page",
+  "stepId": "S000002",
+  "kind": "agent",
+  "title": "Build Unified Tabbed Page",
+  "io": {
+    "inputJsonPath": "tasks/build-unified-page/input.json",
+    "outputJsonPath": "tasks/build-unified-page/result.json"
+  },
+  "inputs": {
+    "merge": {
+      "commitHash": "67c9e12",
+      "conflictsResolved": [],
+      "error": "",
+      "importsWorking": true,
+      "llmEnabled": true,
+      "mergeSuccess": true
+    },
+    "projectDir": "/home/ubuntu/projects/github-digest"
+  }
+}

@@ -1,0 +1,14 @@
+2026-02-22 07:21:10,020 INFO github_digest.radar.card_generator Starting worker for 2026-02-22: 7 items in queue
+2026-02-22 07:21:10,026 INFO github_digest.radar.card_generator [1/7] ⏳ Analyzing 'Gemini 3.1 Pro' (attempt 1)...
+2026-02-22 07:22:31,759 INFO httpx HTTP Request: POST http://localhost:11434/api/generate "HTTP/1.1 200 OK"
+2026-02-22 07:22:31,768 INFO github_digest.radar.card_generator [1/7] ✓ Done (82s)
+2026-02-22 07:22:31,775 INFO github_digest.radar.card_generator [2/7] ⏳ Analyzing 'I found a Vulnerability. They found a Lawyer' (attempt 1)...
+2026-02-22 07:23:58,243 INFO httpx HTTP Request: POST http://localhost:11434/api/generate "HTTP/1.1 200 OK"
+2026-02-22 07:23:58,255 INFO github_digest.radar.card_generator [2/7] ✓ Done (86s)
+2026-02-22 07:23:58,261 INFO github_digest.radar.card_generator [3/7] ⏳ Analyzing 'The path to ubiquitous AI (17k tokens/sec)' (attempt 1)...
+2026-02-22 07:25:14,052 INFO httpx HTTP Request: POST http://localhost:11434/api/generate "HTTP/1.1 200 OK"
+2026-02-22 07:25:14,060 INFO github_digest.radar.card_generator [3/7] ✓ Done (76s)
+2026-02-22 07:25:14,064 INFO github_digest.radar.card_generator All items processed for 2026-02-22. Running pair_daily...
+2026-02-22 07:25:14,079 INFO github_digest.radar.pairing Generated 0 pairings for 2026-02-22
+2026-02-22 07:25:14,079 INFO github_digest.radar.card_generator Pairing result: {'pairings': 0, 'date': '2026-02-22'}
+2026-02-22 07:25:14,079 INFO github_digest.cli Worker result: {'processed': 3, 'date': '2026-02-22'}

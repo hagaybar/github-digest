@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T05:26:32.897Z",
+  "data": {
+    "effectId": "01KJ1X0KNCSQ8290V67ND71BHJ",
+    "invocationKey": "github-digest/diagnose-and-fix-empty-board:S000006:final-report",
+    "invocationHash": "03edeace9b61db7447b446a849527d82c33fcbff1d925f20e20e82aed523c429",
+    "stepId": "S000006",
+    "taskId": "final-report",
+    "kind": "agent",
+    "label": "Final Root Cause Report",
+    "taskDefRef": "tasks/01KJ1X0KNCSQ8290V67ND71BHJ/task.json"
+  },
+  "checksum": "3da0ccc20b728f5d35ebdf12d915110cee50b07eefa3940ae8fb726893d7257f"
+}

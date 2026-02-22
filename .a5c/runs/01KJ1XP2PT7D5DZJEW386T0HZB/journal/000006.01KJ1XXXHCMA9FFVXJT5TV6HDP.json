@@ -1,0 +1,15 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-22T05:42:33.261Z",
+  "data": {
+    "effectId": "01KJ1XXXGREFJZZE64A76XEEYW",
+    "invocationKey": "github-digest/unified-page:S000003:run-pipeline",
+    "invocationHash": "dc6f1bd9cc2d9d26b6fbf65cf4cec974b4aa141ede743ec8134c5b5ba991bdb1",
+    "stepId": "S000003",
+    "taskId": "run-pipeline",
+    "kind": "agent",
+    "label": "Restart Server + Run Radar Pipeline",
+    "taskDefRef": "tasks/01KJ1XXXGREFJZZE64A76XEEYW/task.json"
+  },
+  "checksum": "badb3b90b0eb77747c04bd99607e55ea4822a78c460acade8a33331c9db6f5ae"
+}
