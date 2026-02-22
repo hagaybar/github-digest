@@ -380,7 +380,12 @@ def api_today(
     from datetime import datetime, timezone
     date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     items = _get_today_items(db, date_str)
-    return {"date": date_str, "items": items}
+    row = db.execute(
+        text("SELECT MAX(created_at) FROM daily_picks WHERE date = :date"),
+        {"date": date_str},
+    ).scalar()
+    updated_at = str(row) if row else None
+    return {"date": date_str, "updated_at": updated_at, "items": items}
 
 
 @app.get("/api/build")

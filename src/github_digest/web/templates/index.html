@@ -880,9 +880,12 @@
         var date = data.date || '';
         var items = data.items || [];
 
+        var updatedAt = data.updated_at ? new Date(data.updated_at).toLocaleString() : null;
         var html = '';
         html += '<h2 class="radar-section-title">Today\'s Picks</h2>';
-        html += '<p class="radar-subtitle">Curated daily picks \u00b7 ' + escapeHtml(date) + '</p>';
+        html += '<p class="radar-subtitle">Curated daily picks \u00b7 ' + escapeHtml(date);
+        if (updatedAt) html += ' \u00b7 Updated ' + escapeHtml(updatedAt);
+        html += '</p>';
 
         if (items.length === 0) {
           html += '<div class="empty-state">No picks yet for today \u2014 pipeline hasn\'t run.</div>';
