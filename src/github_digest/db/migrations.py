@@ -220,3 +220,33 @@ def migrate(engine: Engine) -> None:
                 "ON daily_pairings(date)"
             )
         )
+
+    # radar_item_analysis: add queue tracking columns
+    if _table_exists(engine, "radar_item_analysis"):
+        for col, col_type, default in [
+            ("status", "TEXT", "'pending'"),
+            ("attempts", "INTEGER", "0"),
+            ("error_message", "TEXT", None),
+            ("started_at", "TEXT", None),
+        ]:
+            if not _column_exists(engine, "radar_item_analysis", col):
+                if default is not None:
+                    with engine.begin() as conn:
+                        conn.execute(text(
+                            f"ALTER TABLE radar_item_analysis ADD COLUMN {col} {col_type} NOT NULL DEFAULT {default}"
+                        ))
+                else:
+                    with engine.begin() as conn:
+                        conn.execute(text(
+                            f"ALTER TABLE radar_item_analysis ADD COLUMN {col} {col_type}"
+                        ))
+        # Backfill existing rows (idempotent: only affects rows still at default 'pending')
+        with engine.begin() as conn:
+            conn.execute(text(
+                "UPDATE radar_item_analysis SET status='completed' "
+                "WHERE analysis_json IS NOT NULL AND status='pending'"
+            ))
+            conn.execute(text(
+                "UPDATE radar_item_analysis SET status='failed' "
+                "WHERE analysis_json IS NULL AND status='pending'"
+            ))

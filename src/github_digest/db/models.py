@@ -135,6 +135,11 @@ class RadarItemAnalysis(Base):
     analysis_version: Mapped[str] = mapped_column(String(20), default="v1")
     analysis_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    # Queue tracking columns
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    started_at: Mapped[str | None] = mapped_column(String(50), nullable=True)
 
     __table_args__ = (
         UniqueConstraint("item_id", "analysis_version", name="uq_analysis_item_version"),

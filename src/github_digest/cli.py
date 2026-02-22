@@ -96,12 +96,24 @@ def cmd_rank_daily(args: argparse.Namespace) -> None:
 
 
 def cmd_analyze_daily(args: argparse.Namespace) -> None:
-    """Generate LLM analysis for daily picks."""
-    from github_digest.radar.card_generator import analyze_daily_picks
+    """Populate the analysis queue for daily picks (fast, no LLM calls)."""
+    from github_digest.radar.card_generator import populate_analysis_queue
     config_path = Path("config/radar_config.yaml")
-    enable_llm = getattr(args, 'enable_llm', False)
-    result = analyze_daily_picks(settings.db_path, config_path, date_str=getattr(args, 'date', None), enable_llm=enable_llm)
-    logger.info("Analysis result: %s", result)
+    result = populate_analysis_queue(settings.db_path, config_path, date_str=getattr(args, 'date', None))
+    print(json.dumps(result))
+
+
+def cmd_analyze_worker(args: argparse.Namespace) -> None:
+    """Background worker: process pending analysis items via Ollama."""
+    from github_digest.radar.card_generator import run_analyze_worker
+    config_path = Path("config/radar_config.yaml")
+    result = run_analyze_worker(
+        settings.db_path,
+        config_path,
+        date_str=getattr(args, 'date', None),
+        watch=getattr(args, 'watch', False),
+    )
+    logger.info("Worker result: %s", result)
 
 
 def cmd_pair_daily(args: argparse.Namespace) -> None:
@@ -109,6 +121,41 @@ def cmd_pair_daily(args: argparse.Namespace) -> None:
     from github_digest.radar.pairing import pair_daily
     result = pair_daily(settings.db_path, date_str=getattr(args, 'date', None))
     logger.info("Pairing result: %s", result)
+
+
+def cmd_orchestrate_daily(args: argparse.Namespace) -> None:
+    """Run the full daily pipeline with prerequisites check and flock."""
+    from github_digest.services.orchestrator import run_orchestrate_daily
+    result = run_orchestrate_daily(
+        date_str=getattr(args, 'date', None),
+        dry_run=getattr(args, 'dry_run', False),
+        skip_github=getattr(args, 'skip_github', False),
+        skip_hn=getattr(args, 'skip_hn', False),
+        skip_analyze=getattr(args, 'skip_analyze', False),
+        skip_pair=getattr(args, 'skip_pair', False),
+    )
+    print(json.dumps(result, indent=2))
+    if not result.get("dry_run") and not result.get("skipped") and not result.get("success"):
+        raise SystemExit(1)
+
+
+def cmd_orchestrate_status(args: argparse.Namespace) -> None:
+    """Print current orchestration state: API, Ollama, worker, analyze queue."""
+    from github_digest.services.orchestrator import get_orchestrate_status
+    result = get_orchestrate_status(date_str=getattr(args, 'date', None))
+    print(json.dumps(result, indent=2))
+
+
+def cmd_watchdog(args: argparse.Namespace) -> None:
+    """Watchdog: check API, Ollama, worker heartbeat. Restart stuck worker."""
+    from github_digest.services.orchestrator import run_watchdog
+    result = run_watchdog(
+        date_str=getattr(args, 'date', None),
+        stuck_minutes=getattr(args, 'stuck_minutes', 20),
+    )
+    print(json.dumps(result, indent=2))
+    if not result.get("healthy"):
+        raise SystemExit(1)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -205,15 +252,44 @@ def build_parser() -> argparse.ArgumentParser:
     p_rank.set_defaults(func=cmd_rank_daily)
 
     # analyze-daily
-    p_analyze = sub.add_parser("analyze-daily", help="Generate LLM analysis for daily picks")
+    p_analyze = sub.add_parser("analyze-daily", help="Populate analysis queue for daily picks (fast, no LLM)")
     p_analyze.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
-    p_analyze.add_argument("--enable-llm", action="store_true", default=False, dest="enable_llm", help="Enable LLM analysis via Ollama")
     p_analyze.set_defaults(func=cmd_analyze_daily)
+
+    # analyze-worker
+    p_worker = sub.add_parser("analyze-worker", help="Process pending analysis items via Ollama (background worker)")
+    p_worker.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
+    p_worker.add_argument("--watch", action="store_true", default=False, help="Keep running after queue is empty, polling for new items")
+    p_worker.set_defaults(func=cmd_analyze_worker)
 
     # pair-daily
     p_pair = sub.add_parser("pair-daily", help="Generate pairings for the day")
     p_pair.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
     p_pair.set_defaults(func=cmd_pair_daily)
+
+    # orchestrate-daily
+    p_orch = sub.add_parser("orchestrate-daily", help="Run full daily pipeline (prerequisites + flock + all steps)")
+    p_orch.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
+    p_orch.add_argument("--dry-run", action="store_true", default=False, dest="dry_run",
+                        help="Print steps that would run without executing")
+    p_orch.add_argument("--skip-github", action="store_true", default=False, dest="skip_github")
+    p_orch.add_argument("--skip-hn", action="store_true", default=False, dest="skip_hn")
+    p_orch.add_argument("--skip-analyze", action="store_true", default=False, dest="skip_analyze",
+                        help="Skip launching analyze-worker")
+    p_orch.add_argument("--skip-pair", action="store_true", default=False, dest="skip_pair")
+    p_orch.set_defaults(func=cmd_orchestrate_daily)
+
+    # orchestrate-status
+    p_status = sub.add_parser("orchestrate-status", help="Show current pipeline state (API, Ollama, worker, queue)")
+    p_status.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
+    p_status.set_defaults(func=cmd_orchestrate_status)
+
+    # watchdog
+    p_watchdog = sub.add_parser("watchdog", help="Check API/Ollama health and restart stuck worker")
+    p_watchdog.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
+    p_watchdog.add_argument("--stuck-minutes", type=int, default=20, dest="stuck_minutes",
+                            help="Minutes without heartbeat before declaring worker stuck (default: 20)")
+    p_watchdog.set_defaults(func=cmd_watchdog)
 
     return parser
 
@@ -238,8 +314,16 @@ def main() -> None:
         cmd_rank_daily(args)
     elif args.command == "analyze-daily":
         cmd_analyze_daily(args)
+    elif args.command == "analyze-worker":
+        cmd_analyze_worker(args)
     elif args.command == "pair-daily":
         cmd_pair_daily(args)
+    elif args.command == "orchestrate-daily":
+        cmd_orchestrate_daily(args)
+    elif args.command == "orchestrate-status":
+        cmd_orchestrate_status(args)
+    elif args.command == "watchdog":
+        cmd_watchdog(args)
     else:
         parser.print_help()
 

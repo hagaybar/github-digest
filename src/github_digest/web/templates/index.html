@@ -3,84 +3,186 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GitHub Digest</title>
+    <title>GitHub Digest &amp; Builder Radar</title>
     <style>
+      /* ---- design tokens ---- */
       :root {
         color-scheme: light;
-        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+        font-family: system-ui, sans-serif;
         background: #f7f4ef;
-        color: #2a2a2a;
+        color: #3d2b1a;
       }
+
+      /* ---- reset / base ---- */
       body {
         margin: 0;
+        padding: 0;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      /* ---- shared header ---- */
+      .site-header {
+        background: #fffaf3;
+        border-bottom: 1px solid #eadfcd;
+        padding: 20px 24px 0;
+      }
+
+      .site-header h1 {
+        margin: 0 0 4px;
+        font-size: 26px;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+        color: #3d2b1a;
+        letter-spacing: -0.3px;
+      }
+
+      .site-header .tagline {
+        margin: 0 0 16px;
+        font-size: 13px;
+        color: #8a6a50;
+      }
+
+      /* ---- tab nav ---- */
+      .tab-nav {
+        display: flex;
+        gap: 0;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .tab-nav li {
+        display: contents;
+      }
+
+      .tab-btn {
+        display: inline-block;
+        padding: 10px 22px;
+        font-size: 14px;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+        color: #8a6a50;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.15s, border-color 0.15s;
+        white-space: nowrap;
+      }
+
+      .tab-btn:hover {
+        color: #3d2b1a;
+      }
+
+      .tab-btn.active {
+        color: #b8884a;
+        border-bottom-color: #b8884a;
+        font-weight: bold;
+      }
+
+      /* ---- tab panels ---- */
+      .tab-panel {
+        display: none;
         padding: 24px;
       }
-      header {
-        margin-bottom: 24px;
+
+      .tab-panel.active {
+        display: block;
       }
-      h1 {
-        margin: 0 0 8px;
-        font-size: 32px;
+
+      /* ====================================================
+         TAB 1 — DIGEST BOARD
+         ==================================================== */
+
+      .digest-header {
+        margin-bottom: 20px;
       }
-      .subtitle {
-        margin: 0 0 16px;
-        color: #6a5d54;
+
+      .digest-header h2 {
+        margin: 0 0 4px;
+        font-size: 22px;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+        color: #3d2b1a;
       }
+
+      .digest-header .subtitle {
+        margin: 0 0 14px;
+        color: #8a6a50;
+        font-size: 13px;
+      }
+
       .controls {
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
         align-items: center;
       }
+
       .controls label {
         font-size: 14px;
-        color: #6a5d54;
+        color: #8a6a50;
       }
+
       select {
         font-family: inherit;
         padding: 6px 10px;
         border-radius: 8px;
         border: 1px solid #eadfcd;
         background: #fffaf3;
+        color: #3d2b1a;
       }
+
       .board {
         display: grid;
         gap: 16px;
         grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       }
+
       .card {
         background: #fffaf3;
         border: 1px solid #eadfcd;
         padding: 12px 16px;
         border-radius: 12px;
       }
+
       .card h3 {
         margin-top: 0;
         font-size: 18px;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+        color: #3d2b1a;
       }
+
       .repo {
         margin: 12px 0;
       }
+
       .repo a {
         color: #2a2a2a;
         text-decoration: none;
       }
+
       .repo a:hover {
         text-decoration: underline;
       }
+
       .meta {
         font-size: 12px;
         color: #6a5d54;
       }
+
       .summary {
         font-size: 13px;
         margin: 6px 0;
       }
+
       .tags {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
       }
+
       .tag {
         background: #eadfcd;
         color: #4a3f38;
@@ -90,13 +192,16 @@
         cursor: pointer;
         user-select: none;
       }
+
       .tag:hover {
         background: #d8cdb8;
       }
+
       .tag.active {
         background: #b8884a;
         color: #fff;
       }
+
       .tag-filter {
         display: flex;
         align-items: center;
@@ -107,6 +212,7 @@
         border-radius: 999px;
         font-size: 13px;
       }
+
       .tag-filter button {
         background: none;
         border: none;
@@ -117,89 +223,506 @@
         line-height: 1;
         opacity: 0.8;
       }
+
       .tag-filter button:hover {
         opacity: 1;
       }
+
       .sparkline {
         display: block;
         margin: 6px 0 2px;
         opacity: 0.7;
       }
+
       .release {
         font-size: 11px;
         color: #6a5d54;
         margin: 4px 0 2px;
       }
+
+      /* ====================================================
+         TAB 2 — TODAY'S 7
+         ==================================================== */
+
+      .radar-section-title {
+        font-size: 20px;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+        color: #3d2b1a;
+        margin: 0 0 4px;
+      }
+
+      .radar-subtitle {
+        font-size: 13px;
+        color: #8a6a50;
+        margin: 0 0 20px;
+      }
+
+      .radar-cards {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      }
+
+      .radar-card {
+        background: #fffaf3;
+        border: 1px solid #eadfcd;
+        border-radius: 12px;
+        padding: 20px;
+        position: relative;
+      }
+
+      .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #b8884a;
+        color: #fff;
+        font-size: 13px;
+        font-weight: bold;
+        font-family: system-ui, sans-serif;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+      }
+
+      .card-top-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .card-top-row-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .source-badge {
+        display: inline-block;
+        font-size: 11px;
+        font-family: system-ui, sans-serif;
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: #eadfcd;
+        color: #6a5d54;
+        margin-bottom: 6px;
+      }
+
+      .source-badge.hn {
+        background: #ff6600;
+        color: #fff;
+      }
+
+      .source-badge.github {
+        background: #24292e;
+        color: #fff;
+      }
+
+      .radar-card h2 {
+        margin: 0 0 6px;
+        font-size: 17px;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+        line-height: 1.3;
+      }
+
+      .radar-card h2 a {
+        color: #2a2a2a;
+        text-decoration: none;
+      }
+
+      .radar-card h2 a:hover {
+        text-decoration: underline;
+      }
+
+      .signals-row {
+        font-size: 12px;
+        color: #8a6a50;
+        margin: 4px 0 10px;
+        font-family: system-ui, sans-serif;
+      }
+
+      .unlock-line {
+        font-style: italic;
+        color: #4a3f36;
+        font-size: 14px;
+        margin: 8px 0 4px;
+      }
+
+      .novelty-line {
+        color: #6a5d54;
+        font-size: 13px;
+        margin: 4px 0 8px;
+        font-family: system-ui, sans-serif;
+      }
+
+      .why-cool-list {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0;
+      }
+
+      .why-cool-list li {
+        font-size: 13px;
+        margin-bottom: 4px;
+        font-family: system-ui, sans-serif;
+        color: #3d2b1a;
+      }
+
+      .why-cool-list li::before {
+        content: "-> ";
+        color: #a08060;
+      }
+
+      .best-start-line {
+        font-size: 12px;
+        color: #6a5d54;
+        margin: 8px 0;
+        font-family: system-ui, sans-serif;
+      }
+
+      .best-start-line strong {
+        color: #4a3f36;
+      }
+
+      .build-ideas-heading {
+        margin: 12px 0 6px;
+        font-size: 13px;
+        color: #4a3f36;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      }
+
+      .build-idea {
+        margin-bottom: 8px;
+        font-family: system-ui, sans-serif;
+      }
+
+      .idea-size-badge {
+        display: inline-block;
+        font-size: 11px;
+        font-family: system-ui, sans-serif;
+        padding: 1px 6px;
+        border-radius: 4px;
+        margin-right: 6px;
+        font-weight: bold;
+      }
+
+      .size-small {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .size-medium {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .size-spicy {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .idea-text {
+        font-size: 13px;
+        color: #3d2b1a;
+      }
+
+      .analysis-pending {
+        color: #a08060;
+        font-style: italic;
+        font-size: 14px;
+        padding: 12px 0 4px;
+      }
+
+      .analyze-status-bar {
+        background: #fff8e1;
+        border: 1px solid #ffe082;
+        color: #5d4037;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        font-family: system-ui, sans-serif;
+      }
+
+      /* ====================================================
+         TAB 3 — BUILD PAIRINGS
+         ==================================================== */
+
+      .pairings-list {
+        display: grid;
+        gap: 20px;
+      }
+
+      .pairing-card {
+        background: #fffaf3;
+        border: 1px solid #eadfcd;
+        border-radius: 12px;
+        padding: 20px;
+      }
+
+      .pairing-headline {
+        font-size: 17px;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+        font-weight: bold;
+        color: #3d2b1a;
+        margin: 0 0 10px;
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .pairing-headline a {
+        color: #2a2a2a;
+        text-decoration: none;
+      }
+
+      .pairing-headline a:hover {
+        text-decoration: underline;
+      }
+
+      .pairing-plus {
+        color: #b8884a;
+        font-size: 22px;
+        font-weight: bold;
+        line-height: 1;
+        padding: 0 4px;
+      }
+
+      .pairing-rationale {
+        color: #6a5d54;
+        font-size: 14px;
+        font-style: italic;
+        margin: 0 0 16px;
+        padding-left: 12px;
+        border-left: 3px solid #eadfcd;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      }
+
+      .pair-items-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      @media (max-width: 600px) {
+        .pair-items-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .pair-item-block {
+        border-left: 3px solid #eadfcd;
+        padding-left: 12px;
+      }
+
+      .pair-item-block .source-badge {
+        margin-bottom: 4px;
+      }
+
+      .pair-item-block h3 {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      }
+
+      .pair-item-block h3 a {
+        color: #2a2a2a;
+        text-decoration: none;
+      }
+
+      .pair-item-block h3 a:hover {
+        text-decoration: underline;
+      }
+
+      .pair-item-unlock {
+        color: #4a3f36;
+        font-size: 13px;
+        font-style: italic;
+        margin: 4px 0;
+      }
+
+      .pair-item-start {
+        color: #6a5d54;
+        font-size: 12px;
+        margin-top: 4px;
+        font-family: system-ui, sans-serif;
+      }
+
+      /* ---- shared empty/loading states ---- */
+      .empty-state {
+        color: #8a6a50;
+        text-align: center;
+        padding: 56px 24px;
+        font-style: italic;
+        font-size: 15px;
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      }
+
+      .loading-state {
+        color: #8a6a50;
+        padding: 24px 0;
+        font-size: 14px;
+        font-style: italic;
+      }
     </style>
   </head>
   <body>
-    <header>
-      <h1>GitHub Digest</h1>
-      <p class="subtitle">Today’s picks from your saved searches, tuned for discovery.</p>
-      <div class="controls">
-        <label>
-          Mode
-          <select id="mode">
-            <option value="new">New</option>
-            <option value="rising">Rising</option>
-            <option value="updated">Updated</option>
-          </select>
-        </label>
-        <label>
-          Timeframe
-          <select id="timeframe">
-            <option value="1">24h</option>
-            <option value="7" selected>7d</option>
-            <option value="30">30d</option>
-          </select>
-        </label>
+
+    <!-- ========== SHARED HEADER ========== -->
+    <div class="site-header">
+      <h1>GitHub Digest &amp; Builder Radar</h1>
+      <p class="tagline">Discovery board + curated daily picks + build pairings</p>
+      <ul class="tab-nav" role="tablist">
+        <li role="presentation">
+          <button class="tab-btn" role="tab" data-tab="digest" aria-selected="false">Digest Board</button>
+        </li>
+        <li role="presentation">
+          <button class="tab-btn" role="tab" data-tab="today" aria-selected="false">Today's 7</button>
+        </li>
+        <li role="presentation">
+          <button class="tab-btn" role="tab" data-tab="build" aria-selected="false">Build Pairings</button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ========== TAB 1: DIGEST BOARD ========== -->
+    <section id="tab-digest" class="tab-panel" role="tabpanel">
+      <div class="digest-header">
+        <h2>Digest Board</h2>
+        <p class="subtitle">Today's picks from your saved searches, tuned for discovery.</p>
+        <div class="controls">
+          <label>
+            Mode
+            <select id="mode">
+              <option value="new">New</option>
+              <option value="rising">Rising</option>
+              <option value="updated">Updated</option>
+            </select>
+          </label>
+          <label>
+            Timeframe
+            <select id="timeframe">
+              <option value="1">24h</option>
+              <option value="7" selected>7d</option>
+              <option value="30">30d</option>
+            </select>
+          </label>
+        </div>
       </div>
-    </header>
-    <section id="board" class="board">Loading…</section>
+      <section id="board" class="board"><p class="loading-state">Loading…</p></section>
+    </section>
+
+    <!-- ========== TAB 2: TODAY'S 7 ========== -->
+    <section id="tab-today" class="tab-panel" role="tabpanel">
+      <div id="today-content"><p class="loading-state">Loading…</p></div>
+    </section>
+
+    <!-- ========== TAB 3: BUILD PAIRINGS ========== -->
+    <section id="tab-build" class="tab-panel" role="tabpanel">
+      <div id="build-content"><p class="loading-state">Loading…</p></div>
+    </section>
 
     <script>
+      /* ==============================================
+         TAB MANAGEMENT
+         ============================================== */
+
+      function switchTab(tabId) {
+        const validTabs = ['digest', 'today', 'build'];
+        if (!validTabs.includes(tabId)) tabId = 'digest';
+
+        // Update panels
+        document.querySelectorAll('.tab-panel').forEach(function(panel) {
+          panel.classList.remove('active');
+        });
+        var panel = document.getElementById('tab-' + tabId);
+        if (panel) panel.classList.add('active');
+
+        // Update buttons
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+          var isActive = btn.getAttribute('data-tab') === tabId;
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        // Update hash without triggering hashchange
+        if (location.hash.slice(1) !== tabId) {
+          history.replaceState(null, '', '#' + tabId);
+        }
+
+        // Lazy load tab data
+        if (tabId === 'digest') {
+          if (!digestLoaded) loadBoard();
+        } else if (tabId === 'today') {
+          fetchToday();
+        } else if (tabId === 'build') {
+          fetchBuild();
+        }
+      }
+
+      // Wire tab buttons
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var tabId = btn.getAttribute('data-tab');
+          switchTab(tabId);
+        });
+      });
+
+      // Handle browser back/forward
+      window.addEventListener('hashchange', function() {
+        switchTab(location.hash.slice(1) || 'digest');
+      });
+
+      /* ==============================================
+         TAB 1: DIGEST BOARD
+         ============================================== */
+
+      var digestLoaded = false;
+      var boardData = {};
+      var activeTag = null;
+
       function buildSparkline(history, width, height) {
-        const stars = history.map((h) => h.stars);
-        const min = Math.min(...stars);
-        const max = Math.max(...stars);
-        const range = max - min || 1;
-        const n = stars.length;
-        const pad = 2;
-        const points = stars
-          .map((s, i) => {
-            const x = pad + (i / (n - 1)) * (width - pad * 2);
-            const y = pad + (1 - (s - min) / range) * (height - pad * 2);
-            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        var stars = history.map(function(h) { return h.stars; });
+        var min = Math.min.apply(null, stars);
+        var max = Math.max.apply(null, stars);
+        var range = max - min || 1;
+        var n = stars.length;
+        var pad = 2;
+        var points = stars
+          .map(function(s, i) {
+            var x = pad + (i / (n - 1)) * (width - pad * 2);
+            var y = pad + (1 - (s - min) / range) * (height - pad * 2);
+            return x.toFixed(1) + ',' + y.toFixed(1);
           })
-          .join(" ");
-        const ns = "http://www.w3.org/2000/svg";
-        const svg = document.createElementNS(ns, "svg");
-        svg.setAttribute("width", width);
-        svg.setAttribute("height", height);
-        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-        svg.classList.add("sparkline");
-        const pl = document.createElementNS(ns, "polyline");
-        pl.setAttribute("points", points);
-        pl.setAttribute("fill", "none");
-        pl.setAttribute("stroke", "#b8884a");
-        pl.setAttribute("stroke-width", "1.5");
-        pl.setAttribute("stroke-linejoin", "round");
-        pl.setAttribute("stroke-linecap", "round");
+          .join(' ');
+        var ns = 'http://www.w3.org/2000/svg';
+        var svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('width', width);
+        svg.setAttribute('height', height);
+        svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+        svg.classList.add('sparkline');
+        var pl = document.createElementNS(ns, 'polyline');
+        pl.setAttribute('points', points);
+        pl.setAttribute('fill', 'none');
+        pl.setAttribute('stroke', '#b8884a');
+        pl.setAttribute('stroke-width', '1.5');
+        pl.setAttribute('stroke-linejoin', 'round');
+        pl.setAttribute('stroke-linecap', 'round');
         svg.appendChild(pl);
         // Dot at the last point
-        const lastX = pad + (width - pad * 2);
-        const lastY = pad + (1 - (stars[n - 1] - min) / range) * (height - pad * 2);
-        const circle = document.createElementNS(ns, "circle");
-        circle.setAttribute("cx", lastX.toFixed(1));
-        circle.setAttribute("cy", lastY.toFixed(1));
-        circle.setAttribute("r", "2.5");
-        circle.setAttribute("fill", "#b8884a");
+        var lastX = pad + (width - pad * 2);
+        var lastY = pad + (1 - (stars[n - 1] - min) / range) * (height - pad * 2);
+        var circle = document.createElementNS(ns, 'circle');
+        circle.setAttribute('cx', lastX.toFixed(1));
+        circle.setAttribute('cy', lastY.toFixed(1));
+        circle.setAttribute('r', '2.5');
+        circle.setAttribute('fill', '#b8884a');
         svg.appendChild(circle);
         return svg;
       }
-
-      let boardData = {};
-      let activeTag = null;
 
       function setActiveTag(tag) {
         activeTag = activeTag === tag ? null : tag;
@@ -208,52 +731,56 @@
 
       function renderBoard() {
         // Update filter pill in controls
-        const existingPill = document.getElementById("tag-filter-pill");
+        var existingPill = document.getElementById('tag-filter-pill');
         if (existingPill) existingPill.remove();
         if (activeTag) {
-          const pill = document.createElement("div");
-          pill.id = "tag-filter-pill";
-          pill.className = "tag-filter";
-          pill.innerHTML = `<span>${activeTag}</span><button title="Clear filter">✕</button>`;
-          pill.querySelector("button").addEventListener("click", () => setActiveTag(activeTag));
-          document.querySelector(".controls").appendChild(pill);
+          var pill = document.createElement('div');
+          pill.id = 'tag-filter-pill';
+          pill.className = 'tag-filter';
+          pill.innerHTML = '<span>' + activeTag + '</span><button title="Clear filter">\u2715</button>';
+          pill.querySelector('button').addEventListener('click', function() { setActiveTag(activeTag); });
+          document.querySelector('.controls').appendChild(pill);
         }
 
-        const boardEl = document.getElementById("board");
-        boardEl.innerHTML = "";
+        var boardEl = document.getElementById('board');
+        boardEl.innerHTML = '';
 
-        Object.entries(boardData).forEach(([name, repos]) => {
-          const filtered = activeTag
-            ? repos.filter((r) => (r.tags || []).map((t) => t.toLowerCase()).includes(activeTag.toLowerCase()))
+        Object.entries(boardData).forEach(function(entry) {
+          var name = entry[0];
+          var repos = entry[1];
+          var filtered = activeTag
+            ? repos.filter(function(r) {
+                return (r.tags || []).map(function(t) { return t.toLowerCase(); }).includes(activeTag.toLowerCase());
+              })
             : repos;
 
           // Hide entire card if filter leaves it empty (but only when filtering)
           if (activeTag && filtered.length === 0) return;
 
-          const card = document.createElement("div");
-          card.className = "card";
-          const title = document.createElement("h3");
+          var card = document.createElement('div');
+          card.className = 'card';
+          var title = document.createElement('h3');
           title.textContent = name;
           card.appendChild(title);
 
           if (filtered.length === 0) {
-            const empty = document.createElement("p");
-            empty.textContent = "No repos yet. Run fetch.";
+            var empty = document.createElement('p');
+            empty.textContent = 'No repos yet. Run fetch.';
             card.appendChild(empty);
           } else {
-            filtered.forEach((repo) => {
-              const row = document.createElement("div");
-              row.className = "repo";
-              row.innerHTML = `<a href="${repo.html_url}" target="_blank">${repo.full_name}</a>`;
-              const meta = document.createElement("div");
-              meta.className = "meta";
-              const delta = repo.delta !== null && repo.delta !== undefined ? ` · +${repo.delta} ★` : "";
-              const forks = repo.forks ? ` · 🍴 ${repo.forks.toLocaleString()}` : "";
-              const pushedAge = repo.pushed_at ? (() => {
-                const days = Math.floor((Date.now() - new Date(repo.pushed_at)) / 86400000);
-                return days === 0 ? " · pushed today" : days === 1 ? " · pushed yesterday" : ` · pushed ${days}d ago`;
-              })() : "";
-              meta.textContent = `⭐ ${repo.stars.toLocaleString()} · ${repo.language || "n/a"}${forks}${delta}${pushedAge}`;
+            filtered.forEach(function(repo) {
+              var row = document.createElement('div');
+              row.className = 'repo';
+              row.innerHTML = '<a href="' + repo.html_url + '" target="_blank">' + repo.full_name + '</a>';
+              var meta = document.createElement('div');
+              meta.className = 'meta';
+              var delta = repo.delta !== null && repo.delta !== undefined ? ' \u00b7 +' + repo.delta + ' \u2605' : '';
+              var forks = repo.forks ? ' \u00b7 \uD83C\uDF74 ' + repo.forks.toLocaleString() : '';
+              var pushedAge = repo.pushed_at ? (function() {
+                var days = Math.floor((Date.now() - new Date(repo.pushed_at)) / 86400000);
+                return days === 0 ? ' \u00b7 pushed today' : days === 1 ? ' \u00b7 pushed yesterday' : ' \u00b7 pushed ' + days + 'd ago';
+              })() : '';
+              meta.textContent = '\u2B50 ' + repo.stars.toLocaleString() + ' \u00b7 ' + (repo.language || 'n/a') + forks + delta + pushedAge;
               row.appendChild(meta);
 
               if (repo.star_history && repo.star_history.length >= 2) {
@@ -261,34 +788,34 @@
               }
 
               if (repo.summary) {
-                const summary = document.createElement("div");
-                summary.className = "summary";
+                var summary = document.createElement('div');
+                summary.className = 'summary';
                 summary.textContent = repo.summary;
                 row.appendChild(summary);
 
                 if (repo.why_interesting) {
-                  const why = document.createElement("div");
-                  why.className = "summary";
+                  var why = document.createElement('div');
+                  why.className = 'summary';
                   why.textContent = repo.why_interesting;
                   row.appendChild(why);
                 }
 
                 if (repo.latest_release_tag) {
-                  const rel = document.createElement("div");
-                  rel.className = "release";
-                  rel.textContent = `📦 ${repo.latest_release_tag}` +
-                    (repo.latest_release_summary ? ` · ${repo.latest_release_summary}` : "");
+                  var rel = document.createElement('div');
+                  rel.className = 'release';
+                  rel.textContent = '\uD83D\uDCE6 ' + repo.latest_release_tag +
+                    (repo.latest_release_summary ? ' \u00b7 ' + repo.latest_release_summary : '');
                   row.appendChild(rel);
                 }
 
                 if (repo.tags && repo.tags.length) {
-                  const tags = document.createElement("div");
-                  tags.className = "tags";
-                  repo.tags.forEach((tag) => {
-                    const chip = document.createElement("span");
-                    chip.className = "tag" + (activeTag && tag.toLowerCase() === activeTag.toLowerCase() ? " active" : "");
+                  var tags = document.createElement('div');
+                  tags.className = 'tags';
+                  repo.tags.forEach(function(tag) {
+                    var chip = document.createElement('span');
+                    chip.className = 'tag' + (activeTag && tag.toLowerCase() === activeTag.toLowerCase() ? ' active' : '');
                     chip.textContent = tag;
-                    chip.addEventListener("click", () => setActiveTag(tag));
+                    chip.addEventListener('click', function() { setActiveTag(tag); });
                     tags.appendChild(chip);
                   });
                   row.appendChild(tags);
@@ -304,19 +831,354 @@
       }
 
       async function loadBoard() {
+        digestLoaded = true;
         activeTag = null;
-        const mode = document.getElementById("mode").value;
-        const timeframe = document.getElementById("timeframe").value;
-        document.getElementById("board").textContent = "Loading…";
-        const response = await fetch(`/board/today?mode=${mode}&window_days=${timeframe}`);
-        const data = await response.json();
+        var mode = document.getElementById('mode').value;
+        var timeframe = document.getElementById('timeframe').value;
+        document.getElementById('board').innerHTML = '<p class="loading-state">Loading\u2026</p>';
+        var response = await fetch('/board/today?mode=' + mode + '&window_days=' + timeframe);
+        var data = await response.json();
         boardData = data.board;
         renderBoard();
       }
 
-      document.getElementById("mode").addEventListener("change", loadBoard);
-      document.getElementById("timeframe").addEventListener("change", loadBoard);
-      loadBoard();
+      document.getElementById('mode').addEventListener('change', loadBoard);
+      document.getElementById('timeframe').addEventListener('change', loadBoard);
+
+      /* ==============================================
+         TAB 2: TODAY'S 7
+         ============================================== */
+
+      var todayLoaded = false;
+
+      function sourceBadgeHTML(source) {
+        if (!source) return '';
+        var cls = '';
+        var label = source;
+        var s = source.toLowerCase();
+        if (s === 'hn' || s === 'hackernews' || s === 'hacker_news') {
+          cls = 'hn';
+          label = 'HN';
+        } else if (s === 'github') {
+          cls = 'github';
+          label = 'GitHub';
+        }
+        return '<span class="source-badge ' + cls + '">' + escapeHtml(label) + '</span>';
+      }
+
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function renderToday(data) {
+        var container = document.getElementById('today-content');
+        var date = data.date || '';
+        var items = data.items || [];
+
+        var html = '';
+        html += '<h2 class="radar-section-title">Today\'s Picks</h2>';
+        html += '<p class="radar-subtitle">Curated daily picks \u00b7 ' + escapeHtml(date) + '</p>';
+
+        if (items.length === 0) {
+          html += '<div class="empty-state">No picks yet for today \u2014 pipeline hasn\'t run.</div>';
+          container.innerHTML = html;
+          return;
+        }
+
+        html += '<div id="analyze-status-bar" class="analyze-status-bar" style="display:none"></div>';
+        html += '<div class="radar-cards">';
+
+        items.forEach(function(item, idx) {
+          var rank = item.rank != null ? item.rank : (idx + 1);
+          var analysis = item.analysis || null;
+          var signals = item.signals || {};
+
+          html += '<div class="radar-card" data-item-id="' + escapeHtml(item.id) + '">';
+
+          // Top row: rank badge + source badge + title
+          html += '<div class="card-top-row">';
+          html += '<div class="rank-badge">' + rank + '</div>';
+          html += '<div class="card-top-row-content">';
+          html += sourceBadgeHTML(item.source);
+          html += '<h2><a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' + escapeHtml(item.title) + '</a></h2>';
+          html += '</div>';
+          html += '</div>';
+
+          // Signals row
+          var sigParts = [];
+          if (signals.github_stars_total) sigParts.push('\u2B50 ' + Number(signals.github_stars_total).toLocaleString() + ' stars');
+          if (signals.hn_points) sigParts.push('\uD83D\uDD3A ' + signals.hn_points + ' pts');
+          if (sigParts.length) {
+            html += '<div class="signals-row">' + sigParts.join(' \u00b7 ') + '</div>';
+          }
+
+          html += '<div class="card-analysis">' + renderAnalysisHTML(analysis) + '</div>';
+
+          html += '</div>'; // .radar-card
+        });
+
+        html += '</div>'; // .radar-cards
+
+        container.innerHTML = html;
+      }
+
+      function renderAnalysisHTML(analysis) {
+        if (!analysis) return '<p class="analysis-pending">Analysis pending\u2026</p>';
+        var html = '';
+        if (analysis.unlock) {
+          html += '<p class="unlock-line">' + escapeHtml(analysis.unlock) + '</p>';
+        }
+        if (analysis.novelty) {
+          html += '<p class="novelty-line">' + escapeHtml(analysis.novelty) + '</p>';
+        }
+        if (analysis.why_cool && analysis.why_cool.length) {
+          html += '<ul class="why-cool-list">';
+          analysis.why_cool.forEach(function(bullet) {
+            html += '<li>' + escapeHtml(bullet) + '</li>';
+          });
+          html += '</ul>';
+        }
+        if (analysis.best_start) {
+          html += '<p class="best-start-line"><strong>Start here:</strong> ' + escapeHtml(analysis.best_start) + '</p>';
+        }
+        if (analysis.build_ideas && analysis.build_ideas.length) {
+          html += '<div class="build-ideas-section">';
+          html += '<p class="build-ideas-heading">Build with this:</p>';
+          analysis.build_ideas.forEach(function(idea) {
+            var size = idea.size || 'small';
+            var sizeClass = 'size-' + size.toLowerCase();
+            html += '<div class="build-idea">';
+            html += '<span class="idea-size-badge ' + sizeClass + '">' + escapeHtml(size) + '</span>';
+            html += '<span class="idea-text">' + escapeHtml(idea.idea) + '</span>';
+            html += '</div>';
+          });
+          html += '</div>';
+        }
+        return html;
+      }
+
+      function patchCardAnalysis(itemId, analysis) {
+        var card = document.querySelector('[data-item-id="' + itemId + '"]');
+        if (!card) return;
+        var analysisDiv = card.querySelector('.card-analysis');
+        if (!analysisDiv) return;
+        analysisDiv.innerHTML = renderAnalysisHTML(analysis);
+      }
+
+      var analyzeStatusInterval = null;
+      var knownCompleted = new Set();
+
+      function startAnalyzePolling() {
+        if (analyzeStatusInterval) return;
+        analyzeStatusInterval = setInterval(checkAnalyzeStatus, 5000);
+      }
+
+      function stopAnalyzePolling() {
+        if (analyzeStatusInterval) {
+          clearInterval(analyzeStatusInterval);
+          analyzeStatusInterval = null;
+        }
+      }
+
+      function updateStatusBar(status) {
+        var bar = document.getElementById('analyze-status-bar');
+        if (!bar) return;
+        if (!status || status.total === 0) {
+          bar.style.display = 'none';
+          return;
+        }
+        var inProgress = status.pending + status.processing;
+        if (inProgress > 0) {
+          bar.style.display = 'block';
+          var msg = 'Analyzing ' + status.completed + '/' + status.total + ' items\u2026';
+          if (status.processing > 0) msg += ' (\u23f3 ' + status.processing + ' in progress)';
+          bar.textContent = msg;
+        } else if (!status.done) {
+          bar.style.display = 'block';
+          bar.textContent = 'Analysis complete: ' + status.completed + '/' + status.total + ' succeeded.';
+        } else {
+          bar.style.display = 'none';
+        }
+      }
+
+      async function checkAnalyzeStatus() {
+        try {
+          var res = await fetch('/api/analyze/status');
+          var status = await res.json();
+          updateStatusBar(status);
+
+          // Find newly completed items and patch their cards
+          var newlyCompleted = [];
+          (status.items || []).forEach(function(item) {
+            if (item.status === 'completed' && !knownCompleted.has(item.id)) {
+              knownCompleted.add(item.id);
+              newlyCompleted.push(item.id);
+            }
+          });
+
+          if (newlyCompleted.length > 0) {
+            var todayRes = await fetch('/api/today');
+            var todayData = await todayRes.json();
+            newlyCompleted.forEach(function(itemId) {
+              var newItem = (todayData.items || []).find(function(it) { return it.id === itemId; });
+              if (newItem && newItem.analysis) {
+                patchCardAnalysis(itemId, newItem.analysis);
+              }
+            });
+          }
+
+          if (status.done) {
+            stopAnalyzePolling();
+            setTimeout(function() {
+              var bar = document.getElementById('analyze-status-bar');
+              if (bar) bar.style.display = 'none';
+            }, 3000);
+          }
+        } catch (err) {
+          // Silently ignore status check errors
+        }
+      }
+
+      async function fetchToday() {
+        if (todayLoaded) return;
+        todayLoaded = true;
+        try {
+          var res = await fetch('/api/today');
+          var data = await res.json();
+
+          // Seed known-completed set before rendering
+          knownCompleted = new Set();
+          (data.items || []).forEach(function(item) {
+            if (item.analysis) knownCompleted.add(item.id);
+          });
+
+          renderToday(data);
+
+          // Check analysis status and start polling if not done
+          try {
+            var statusRes = await fetch('/api/analyze/status');
+            var statusData = await statusRes.json();
+            updateStatusBar(statusData);
+            if (!statusData.done && statusData.total > 0) {
+              startAnalyzePolling();
+            }
+          } catch (e) {
+            // Status endpoint unavailable, skip polling
+          }
+        } catch (err) {
+          document.getElementById('today-content').innerHTML =
+            '<div class="empty-state">Failed to load today\'s picks. Is the server running?</div>';
+        }
+      }
+
+      /* ==============================================
+         TAB 3: BUILD PAIRINGS
+         ============================================== */
+
+      var buildLoaded = false;
+
+      function renderBuild(data) {
+        var container = document.getElementById('build-content');
+        var date = data.date || '';
+        var pairings = data.pairings || [];
+
+        var html = '';
+        html += '<h2 class="radar-section-title">Build Pairings</h2>';
+        html += '<p class="radar-subtitle">Complementary tool pairings \u00b7 ' + escapeHtml(date) + '</p>';
+
+        if (pairings.length === 0) {
+          html += '<div class="empty-state">No pairings yet for today \u2014 pipeline hasn\'t run.</div>';
+          container.innerHTML = html;
+          return;
+        }
+
+        html += '<div class="pairings-list">';
+
+        pairings.forEach(function(pairing) {
+          var a = pairing.item_a || {};
+          var b = pairing.item_b || {};
+          var aa = a.analysis || null;
+          var ba = b.analysis || null;
+
+          html += '<div class="pairing-card">';
+
+          // Headline: Title A + Title B
+          html += '<div class="pairing-headline">';
+          html += '<a href="' + escapeHtml(a.url) + '" target="_blank" rel="noopener">' + escapeHtml(a.title) + '</a>';
+          html += '<span class="pairing-plus">+</span>';
+          html += '<a href="' + escapeHtml(b.url) + '" target="_blank" rel="noopener">' + escapeHtml(b.title) + '</a>';
+          html += '</div>';
+
+          // Rationale
+          if (pairing.rationale) {
+            html += '<p class="pairing-rationale">' + escapeHtml(pairing.rationale) + '</p>';
+          }
+
+          // Two-column item blocks
+          html += '<div class="pair-items-grid">';
+
+          // Item A
+          html += '<div class="pair-item-block">';
+          html += sourceBadgeHTML(a.source);
+          html += '<h3><a href="' + escapeHtml(a.url) + '" target="_blank" rel="noopener">' + escapeHtml(a.title) + '</a></h3>';
+          if (aa && aa.unlock) {
+            html += '<p class="pair-item-unlock">' + escapeHtml(aa.unlock) + '</p>';
+          } else if (a.description) {
+            html += '<p class="pair-item-unlock">' + escapeHtml(a.description) + '</p>';
+          }
+          if (aa && aa.best_start) {
+            html += '<p class="pair-item-start">Start: ' + escapeHtml(aa.best_start) + '</p>';
+          }
+          html += '</div>';
+
+          // Item B
+          html += '<div class="pair-item-block">';
+          html += sourceBadgeHTML(b.source);
+          html += '<h3><a href="' + escapeHtml(b.url) + '" target="_blank" rel="noopener">' + escapeHtml(b.title) + '</a></h3>';
+          if (ba && ba.unlock) {
+            html += '<p class="pair-item-unlock">' + escapeHtml(ba.unlock) + '</p>';
+          } else if (b.description) {
+            html += '<p class="pair-item-unlock">' + escapeHtml(b.description) + '</p>';
+          }
+          if (ba && ba.best_start) {
+            html += '<p class="pair-item-start">Start: ' + escapeHtml(ba.best_start) + '</p>';
+          }
+          html += '</div>';
+
+          html += '</div>'; // .pair-items-grid
+          html += '</div>'; // .pairing-card
+        });
+
+        html += '</div>'; // .pairings-list
+
+        container.innerHTML = html;
+      }
+
+      async function fetchBuild() {
+        if (buildLoaded) return;
+        buildLoaded = true;
+        try {
+          var res = await fetch('/api/build');
+          var data = await res.json();
+          renderBuild(data);
+        } catch (err) {
+          document.getElementById('build-content').innerHTML =
+            '<div class="empty-state">Failed to load build pairings. Is the server running?</div>';
+        }
+      }
+
+      /* ==============================================
+         BOOT: read hash and activate first tab
+         ============================================== */
+      document.addEventListener('DOMContentLoaded', function() {
+        var tab = (location.hash.slice(1) || 'digest');
+        switchTab(tab);
+      });
     </script>
   </body>
 </html>

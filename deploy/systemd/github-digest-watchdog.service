@@ -1,0 +1,33 @@
+[Unit]
+Description=Builder Radar watchdog (health check + stuck worker recovery)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=github-digest
+Group=github-digest
+WorkingDirectory=/opt/github-digest
+EnvironmentFile=/etc/github-digest.env
+
+RuntimeDirectory=github-digest
+RuntimeDirectoryMode=0750
+
+ExecStart=/opt/github-digest/.venv/bin/github-digest watchdog
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=github-digest-watchdog
+
+# Watchdog is lightweight; minimal hardening to allow /tmp access for PID files
+NoNewPrivileges=yes
+PrivateTmp=no
+ProtectSystem=strict
+ProtectHome=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=no
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/opt/github-digest /var/log/github-digest /tmp

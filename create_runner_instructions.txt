@@ -1,0 +1,93 @@
+You are Claude Code operating as a senior platform engineer.
+
+Goal
+Implement a production-grade “orchestrator” for this repo that makes the whole pipeline operational 24/7:
+- Always-on services: API server + Ollama
+- Scheduled runs: daily pipeline + optional periodic ingest
+- Safe background analysis: handle already-running worker gracefully
+- Monitoring: clear health checks, logs, and a watchdog
+
+Constraints / Requirements
+1) Work on a NEW git branch. Do not break current behavior. All changes must be additive and backwards compatible.
+2) The orchestrator must be idempotent:
+   - safe to run multiple times
+   - must not start duplicate workers
+   - must not corrupt DB
+3) Concurrency control:
+   - use a lock (flock or equivalent) so that daily orchestrations never overlap
+   - also ensure analyze-worker is single-instance per date
+4) Prerequisites checks before running:
+   - venv exists and is usable
+   - DB path exists and writable
+   - required config files exist
+   - Ollama reachable on localhost:11434
+   - required model exists (configurable)
+   - API health endpoint responds (or add one)
+5) Process handling (“smart + graceful”):
+   - If API already running: keep it unless unhealthy
+   - If Ollama already running: keep it unless unhealthy
+   - If analyze-worker already running for today and making progress: let it continue
+   - If analyze-worker appears stuck (no progress for N minutes): restart it (define “stuck” precisely)
+6) Monitoring & observability:
+   - structured logging to both journald (systemd) and file logs in a defined directory
+   - implement or extend API endpoints needed for health and analyze status (e.g., /api/health, /api/analyze/status)
+   - add a watchdog service/timer that checks API + Ollama health and optionally worker heartbeat
+7) Deployment:
+   - systemd units + timers are the primary path (not cron)
+   - provide a single “install/update” script or Makefile target that installs/updates the units and reloads systemd
+   - include a README section: setup, enable, verify, troubleshoot
+8) Must run on ARM64 Linux (OCI Ampere), minimal deps. Prefer bash + python already in repo.
+9) All ports: keep Ollama bound to localhost; API may bind 0.0.0.0:8000 (document firewall + OCI security list steps but do NOT attempt to edit cloud config).
+10) Testing:
+   - include a “dry-run” mode for orchestrator
+   - include a “status” command that prints current state (services, timers, last run, worker state)
+
+Deliverables
+A) PLAN first (before coding):
+   - Identify existing relevant scripts/commands in repo (fetch, run_daily_pipeline.py, analyze-worker, pair-daily, serve, health, etc.)
+   - Decide orchestrator architecture: bash script vs python CLI module (prefer whichever best fits repo style)
+   - Define “worker progress/stuck detection”: choose either DB heartbeat fields or a heartbeat file in /run
+   - Design systemd units: orchestrator oneshot service + daily timer + watchdog oneshot + frequent timer
+   - Define log locations, ownership, permissions
+   - List exact files to be created/modified
+
+B) IMPLEMENT after the plan is approved by you (do not ask me; just proceed after writing the plan):
+   1) Create orchestrator command:
+      - e.g. `github-digest orchestrate-daily` or `scripts/orchestrate_daily.sh`
+      - supports: --dry-run, --date, --model, --skip-github, --skip-hn, --skip-analyze, --skip-pair (use existing flags if they exist)
+      - uses flock lock
+      - checks prerequisites and starts required services if needed
+      - triggers daily pipeline in correct order
+   2) Worker single-instance enforcement:
+      - implement heartbeat/progress tracking in worker
+      - implement “stuck detection” and restart logic (in watchdog)
+   3) Health endpoints:
+      - add/extend `/api/health` to check DB connectivity and core tables
+      - ensure `/api/analyze/status` exists and is accurate
+   4) systemd:
+      - add units under deploy/systemd/ (or repo standard path)
+      - add install script to copy units to /etc/systemd/system, daemon-reload, enable --now services/timers
+   5) docs:
+      - README “Operations” section: setup, enable, verify, logs, troubleshooting
+   6) tests/smoke:
+      - basic test scripts or commands showing how to validate locally (systemctl status, curl endpoints)
+      - ensure dry-run works
+
+Implementation details to follow
+- Make lock files under /run or /var/lock
+- Use systemd ExecStartPre for some checks if helpful, but main logic should live in orchestrator script
+- Never hardcode user paths like /home/ubuntu unless repo already does; prefer /opt/<app> and document it
+- Use safe defaults but allow overrides via env vars:
+  - GITHUB_DIGEST_HOME, GITHUB_DIGEST_MODEL, GITHUB_DIGEST_LOG_DIR, GITHUB_DIGEST_DB_PATH
+- Make sure timers are Persistent=true
+
+Output expectations
+1) First output: a clear plan with file list + sequencing.
+2) Then implement in code on a new branch with sensible commit messages.
+3) Provide a final “how to run” section with exact commands:
+   - install
+   - enable
+   - run once
+   - verify
+   - view logs
+   - troubleshoot

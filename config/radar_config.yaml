@@ -14,3 +14,7 @@ llm:
   enable_llm: true  # set to true to use LLM analysis
   model: "llama3.2"
   ollama_base_url: "http://localhost:11434"
+worker:
+  max_attempts: 3
+  timeout_seconds: 300
+  stale_timeout_minutes: 10
