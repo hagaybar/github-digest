@@ -237,11 +237,18 @@ def check_prerequisites(
 
 def _find_cmd() -> str:
     """Find the github-digest binary."""
+    # Check same venv as the running Python first (most reliable)
+    venv_bin = Path(sys.executable).parent / "github-digest"
+    if venv_bin.exists():
+        return str(venv_bin)
+    # Then try PATH
     cmd = shutil.which("github-digest")
     if cmd:
         return cmd
-    # Fallback: use current Python + module
-    return f"{sys.executable} -m github_digest.cli"
+    raise RuntimeError(
+        f"github-digest binary not found. Checked {venv_bin} and PATH. "
+        "Ensure the package is installed: pip install -e ."
+    )
 
 
 def _launch_worker(date_str: str, log_dir: Path) -> int:
