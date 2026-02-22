@@ -155,7 +155,6 @@ def _board_new(
     stars_max: int = 500000,
     include_summary: bool = True,
 ) -> list[BoardItem]:
-    today = _today_filter()
     cutoff = datetime.now(timezone.utc) - timedelta(days=window_days)
     exclude_known = _exclude_known_filter(search.exclude_known)
 
@@ -173,7 +172,7 @@ def _board_new(
     stmt = (
         stmt
         .where(RepoSearch.query_name == search.name)
-        .where(func.date(RepoSearch.last_seen_at) == today)
+        .where(RepoSearch.last_seen_at >= cutoff)
         .where(Repo.first_seen_at >= cutoff)
         .where(Repo.stars <= stars_max)
         .order_by(desc(Repo.first_seen_at), desc(Repo.stars))
@@ -201,7 +200,6 @@ def _board_updated(
     stars_max: int,
     include_summary: bool = True,
 ) -> list[BoardItem]:
-    today = _today_filter()
     cutoff = datetime.now(timezone.utc) - timedelta(days=window_days)
     exclude_known = _exclude_known_filter(search.exclude_known)
 
@@ -219,7 +217,7 @@ def _board_updated(
     stmt = (
         stmt
         .where(RepoSearch.query_name == search.name)
-        .where(func.date(RepoSearch.last_seen_at) == today)
+        .where(RepoSearch.last_seen_at >= cutoff)
         .where(Repo.pushed_at >= cutoff)
         .where(Repo.stars.between(stars_min, stars_max))
         .order_by(desc(Repo.pushed_at), desc(Repo.stars))
@@ -250,6 +248,7 @@ def _board_rising(
     if not inspect(session.bind).has_table("repo_stats_daily"):
         return []
     today = _today_filter()
+    cutoff = datetime.now(timezone.utc) - timedelta(days=window_days)
     target_date = (_today_utc() - timedelta(days=window_days)).isoformat()
     exclude_known = _exclude_known_filter(search.exclude_known)
 
@@ -295,7 +294,7 @@ def _board_rising(
             ),
         )
         .where(RepoSearch.query_name == search.name)
-        .where(func.date(RepoSearch.last_seen_at) == today)
+        .where(RepoSearch.last_seen_at >= cutoff)
         .where(stats_today.c.stars.between(stars_min, stars_max))
         .order_by(desc("delta"), desc(stats_today.c.stars))
         .limit(limit)
