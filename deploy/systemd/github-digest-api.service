@@ -13,7 +13,7 @@ EnvironmentFile=/etc/github-digest.env
 RuntimeDirectory=github-digest
 RuntimeDirectoryMode=0750
 
-ExecStart=/opt/github-digest/.venv/bin/uvicorn github_digest.api.app:app --host 127.0.0.1 --port 8000
+ExecStart=/opt/github-digest/.venv/bin/uvicorn github_digest.api.app:app --host 0.0.0.0 --port 8000
 
 NoNewPrivileges=yes
 PrivateTmp=yes
