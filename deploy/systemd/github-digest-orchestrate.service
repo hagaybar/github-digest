@@ -1,0 +1,41 @@
+[Unit]
+Description=Builder Radar daily pipeline orchestrator
+After=network-online.target ollama.service
+Wants=network-online.target
+# Soft dep on Ollama — don't fail if it's managed separately
+After=ollama.service
+
+[Service]
+Type=oneshot
+User=github-digest
+Group=github-digest
+WorkingDirectory=/opt/github-digest
+EnvironmentFile=/etc/github-digest.env
+
+RuntimeDirectory=github-digest
+RuntimeDirectoryMode=0750
+
+# orchestrate-daily handles its own flock; the service flock is an extra guard
+ExecStart=/opt/github-digest/.venv/bin/github-digest orchestrate-daily
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=github-digest-orchestrate
+
+NoNewPrivileges=yes
+PrivateTmp=no
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=no
+SystemCallArchitectures=native
+RestrictNamespaces=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+# /tmp: PID + heartbeat files; /opt/github-digest: DB + logs; /var/log/github-digest: log dir
+ReadWritePaths=/opt/github-digest /var/log/github-digest /tmp

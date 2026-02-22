@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Builder Radar orchestrator daily at 6am
+
+[Timer]
+OnCalendar=*-*-* 06:00:00
+Persistent=true
+Unit=github-digest-orchestrate.service
+
+[Install]
+WantedBy=timers.target

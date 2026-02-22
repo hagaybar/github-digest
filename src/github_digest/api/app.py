@@ -34,14 +34,71 @@ def on_startup() -> None:
 
 @app.get("/health")
 def health(db: Session = Depends(get_session)) -> dict[str, Any]:
+    from datetime import datetime, timezone
+    import httpx as _httpx
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    # Legacy fields (always present)
     repo_count = db.scalar(select(func.count()).select_from(Repo))
     last_fetch = db.scalar(
         select(func.max(Run.finished_at)).where(Run.run_type == "fetch", Run.status == "finished")
     )
+
+    # DB table counts
+    try:
+        radar_items_count = db.scalar(
+            text("SELECT COUNT(*) FROM radar_items")
+        ) or 0
+        daily_picks_today = db.scalar(
+            text("SELECT COUNT(*) FROM daily_picks WHERE date = :d"),
+            {"d": today},
+        ) or 0
+        analysis_count = db.scalar(
+            text("SELECT COUNT(*) FROM radar_item_analysis WHERE status IN ('pending','processing','completed','failed')")
+        ) or 0
+        db_info = {
+            "connected": True,
+            "tables": {
+                "radar_items": radar_items_count,
+                "daily_picks_today": daily_picks_today,
+                "radar_item_analysis": analysis_count,
+            },
+        }
+    except Exception as e:
+        db_info = {"connected": False, "error": str(e)}
+
+    # Ollama health (non-blocking, 2s timeout)
+    ollama_info: dict[str, Any] = {"reachable": False, "model_available": False, "model": "llama3.2"}
+    try:
+        from github_digest.radar.ranking import load_radar_config
+        _cfg = load_radar_config(Path(__file__).resolve().parents[3] / "config" / "radar_config.yaml")
+        ollama_model = _cfg.get("llm", {}).get("model", "llama3.2")
+        ollama_url = _cfg.get("llm", {}).get("ollama_base_url", "http://localhost:11434")
+        ollama_info["model"] = ollama_model
+        resp = _httpx.get(f"{ollama_url}/api/tags", timeout=2)
+        if resp.status_code == 200:
+            ollama_info["reachable"] = True
+            tags = resp.json()
+            available = [m.get("name", "").split(":")[0] for m in tags.get("models", [])]
+            ollama_info["model_available"] = ollama_model in available or any(
+                m.startswith(ollama_model) for m in available
+            )
+    except Exception:
+        pass
+
+    overall = "ok"
+    if not db_info.get("connected", True):
+        overall = "error"
+    elif not ollama_info["reachable"]:
+        overall = "degraded"
+
     return {
-        "status": "ok",
+        "status": overall,
         "repo_count": repo_count or 0,
         "last_fetch": last_fetch.isoformat() if last_fetch else None,
+        "db": db_info,
+        "ollama": ollama_info,
     }
 
 
@@ -256,6 +313,63 @@ def _get_build_pairings(db: Session, date_str: str) -> list[dict]:
             },
         })
     return pairings
+
+
+@app.get("/api/analyze/status")
+def api_analyze_status(
+    date: str | None = None,
+    db: Session = Depends(get_session),
+) -> dict[str, Any]:
+    from datetime import datetime, timezone
+    date_str = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    rows = db.execute(
+        text("""
+            SELECT dp.rank, ri.id AS item_id, ri.title,
+                   COALESCE(ria.status, 'not_queued') AS status,
+                   COALESCE(ria.attempts, 0) AS attempts,
+                   ria.error_message
+            FROM daily_picks dp
+            JOIN radar_items ri ON dp.item_id = ri.id
+            LEFT JOIN radar_item_analysis ria
+                   ON ria.item_id = ri.id AND ria.analysis_version = 'v1'
+            WHERE dp.date = :date
+            ORDER BY dp.rank ASC
+        """),
+        {"date": date_str},
+    ).fetchall()
+
+    items = [
+        {
+            "rank": row[0],
+            "id": row[1],
+            "title": row[2],
+            "status": row[3],
+            "attempts": row[4],
+            "error_message": row[5],
+        }
+        for row in rows
+    ]
+
+    total = len(items)
+    completed = sum(1 for it in items if it["status"] == "completed")
+    pending = sum(1 for it in items if it["status"] == "pending")
+    processing = sum(1 for it in items if it["status"] == "processing")
+    failed = sum(1 for it in items if it["status"] == "failed")
+    not_queued = sum(1 for it in items if it["status"] == "not_queued")
+
+    done = total > 0 and (pending + processing + not_queued) == 0
+
+    return {
+        "date": date_str,
+        "total": total,
+        "completed": completed,
+        "pending": pending,
+        "processing": processing,
+        "failed": failed,
+        "done": done,
+        "items": items,
+    }
 
 
 @app.get("/api/today")
