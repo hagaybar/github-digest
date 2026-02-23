@@ -13,7 +13,7 @@ EnvironmentFile=/etc/github-digest.env
 RuntimeDirectory=github-digest
 RuntimeDirectoryMode=0750
 
-ExecStart=/usr/bin/flock -n /run/github-digest/summarize.lock /opt/github-digest/.venv/bin/github-digest summarize-llm --limit 3 --model llama3.2
+ExecStart=/usr/bin/flock -n /run/github-digest/summarize.lock /opt/github-digest/.venv/bin/github-digest summarize-llm --limit 20 --model llama3.2
 
 NoNewPrivileges=yes
 PrivateTmp=yes
