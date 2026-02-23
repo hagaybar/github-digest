@@ -334,6 +334,8 @@ def main() -> None:
         cmd_health()
     elif args.command == "ingest-hn":
         cmd_ingest_hn(args)
+    elif args.command == "ingest-reddit":
+        cmd_ingest_reddit(args)
     elif args.command == "rank-daily":
         cmd_rank_daily(args)
     elif args.command == "analyze-daily":
