@@ -83,7 +83,7 @@ def cmd_health() -> None:
 def cmd_ingest_hn(args: argparse.Namespace) -> None:
     """Ingest Hacker News stories into DB."""
     from github_digest.radar.hn_ingestion import ingest_hn
-    result = ingest_hn(settings.db_path, limit=100)
+    result = ingest_hn(settings.db_path, limit=100, github_token=settings.github_token)
     logger.info("HN ingestion result: %s", result)
 
 

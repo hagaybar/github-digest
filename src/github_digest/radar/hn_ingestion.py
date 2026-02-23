@@ -15,6 +15,7 @@ from github_digest.db.models import HNStoryRaw
 logger = logging.getLogger(__name__)
 
 HN_TOP_STORIES_URL = "https://hacker-news.firebaseio.com/v0/topstories.json"
+HN_SHOW_STORIES_URL = "https://hacker-news.firebaseio.com/v0/showstories.json"
 HN_ITEM_URL = "https://hacker-news.firebaseio.com/v0/item/{}.json"
 
 TRACKING_PARAMS = {
@@ -67,6 +68,18 @@ def make_item_id(source: str, source_id: str) -> str:
     return hashlib.sha1(f"{source}:{source_id}".encode()).hexdigest()
 
 
+def fetch_hn_show_ids(limit: int = 50) -> set[int]:
+    """Return a set of story IDs currently in HN Show HN."""
+    try:
+        with httpx.Client(timeout=10) as client:
+            resp = client.get(HN_SHOW_STORIES_URL)
+            resp.raise_for_status()
+            return set(resp.json()[:limit])
+    except Exception as e:
+        logger.warning("Failed to fetch Show HN IDs: %s", e)
+        return set()
+
+
 def fetch_hn_top_stories(limit: int = 100) -> list[dict]:
     """Fetch top HN stories. Returns list of raw story dicts."""
     stories = []
@@ -114,7 +127,7 @@ def upsert_hn_story_raw(session: Session, story_dict: dict) -> HNStoryRaw:
     return record
 
 
-def story_to_radar_item_data(story: HNStoryRaw) -> dict | None:
+def story_to_radar_item_data(story: HNStoryRaw, show_hn_ids: set[int] | None = None) -> dict | None:
     """Convert HNStoryRaw to a RadarItem dict. Returns None if no title."""
     if not story.title:
         return None
@@ -124,10 +137,16 @@ def story_to_radar_item_data(story: HNStoryRaw) -> dict | None:
     if story.time:
         published_at = datetime.utcfromtimestamp(story.time).replace(tzinfo=UTC)
     github_full_name = extract_github_repo_from_url(story.url)
-    signals = {
+    is_show_hn = bool(
+        (show_hn_ids and int(story.hn_id) in show_hn_ids)
+        or story.title.startswith(("Show HN:", "Show HN "))
+    )
+    signals: dict = {
         "hn_points": story.score,
         "hn_comments": story.comments,
     }
+    if is_show_hn:
+        signals["is_show_hn"] = True
     return {
         "id": item_id,
         "source": "hackernews",
@@ -186,30 +205,103 @@ def upsert_radar_item(session: Session, item_data: dict) -> None:
     )
 
 
-def ingest_hn(db_path: Path, limit: int = 100) -> dict:
+def enrich_github_signals(db_path: Path, github_token: str | None) -> int:
+    """Fetch GitHub stars/forks/description for HN items that link to a GitHub repo.
+
+    Updates signals_json in-place.  Returns the number of items enriched.
+    """
+    import json as _json
+
+    from sqlalchemy import text as _text
+
+    from github_digest.services.github_client import GitHubClient
+
+    engine = get_engine(db_path)
+    client = GitHubClient(token=github_token)
+    enriched = 0
+
+    with Session(engine) as session:
+        rows = session.execute(
+            _text("""
+                SELECT id, github_full_name, signals_json
+                FROM radar_items
+                WHERE github_full_name IS NOT NULL
+                  AND source = 'hackernews'
+            """)
+        ).fetchall()
+
+        for row in rows:
+            item_id, full_name, signals_raw = row
+            try:
+                signals = _json.loads(signals_raw) if isinstance(signals_raw, str) else (signals_raw or {})
+                repo_data = client.get_repo(full_name)
+                if not repo_data or repo_data.get("message"):
+                    # API error or repo not found
+                    continue
+                signals["github_stars_total"] = repo_data.get("stargazers_count", 0)
+                signals["github_forks"] = repo_data.get("forks_count", 0)
+                if repo_data.get("description"):
+                    signals["github_description"] = repo_data["description"]
+                if repo_data.get("language"):
+                    signals["github_language"] = repo_data["language"]
+                session.execute(
+                    _text("UPDATE radar_items SET signals_json = :sig WHERE id = :id"),
+                    {"sig": _json.dumps(signals), "id": item_id},
+                )
+                enriched += 1
+            except Exception as e:
+                logger.warning("GitHub enrichment failed for %s: %s", full_name, e)
+
+        session.commit()
+
+    logger.info("Enriched %d HN items with GitHub star data", enriched)
+    return enriched
+
+
+def ingest_hn(db_path: Path, limit: int = 100, github_token: str | None = None) -> dict:
     """Main entry point for HN ingestion. Returns ingestion stats."""
     from sqlalchemy.orm import Session
 
     engine = get_engine(db_path)
+
+    # Fetch Show HN IDs upfront so we can tag items without extra per-story API calls
+    show_hn_ids = fetch_hn_show_ids(limit=50)
+    logger.info("Fetched %d Show HN IDs", len(show_hn_ids))
+
     stories = fetch_hn_top_stories(limit=limit)
 
     ingested = 0
     github_linked = 0
+    show_hn_count = 0
 
     with Session(engine) as session:
         for story_dict in stories:
             try:
                 story = upsert_hn_story_raw(session, story_dict)
                 session.flush()
-                item_data = story_to_radar_item_data(story)
+                item_data = story_to_radar_item_data(story, show_hn_ids=show_hn_ids)
                 if item_data:
                     upsert_radar_item(session, item_data)
                     ingested += 1
                     if item_data.get("github_full_name"):
                         github_linked += 1
+                    if item_data.get("signals_json", {}).get("is_show_hn"):
+                        show_hn_count += 1
             except Exception as e:
                 logger.warning("Failed to process HN story %s: %s", story_dict.get("id"), e)
         session.commit()
 
-    logger.info("Ingested %d HN stories, %d linked to GitHub repos", ingested, github_linked)
-    return {"ingested": ingested, "github_linked": github_linked}
+    logger.info(
+        "Ingested %d HN stories (%d Show HN, %d GitHub-linked)",
+        ingested, show_hn_count, github_linked,
+    )
+
+    # Enrich GitHub-linked items with live star/fork data
+    enriched = enrich_github_signals(db_path, github_token=github_token)
+
+    return {
+        "ingested": ingested,
+        "show_hn": show_hn_count,
+        "github_linked": github_linked,
+        "github_enriched": enriched,
+    }

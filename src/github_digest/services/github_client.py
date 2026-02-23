@@ -48,6 +48,11 @@ class GitHubClient:
         params = self.build_search_params(query, per_page)
         return self._request_json("GET", url, params=params)
 
+    def get_repo(self, full_name: str) -> dict[str, Any]:
+        """Fetch repository metadata (stars, forks, description, language)."""
+        url = f"{self.base_url}/repos/{full_name}"
+        return self._request_json("GET", url)
+
     def _request_json(self, method: str, url: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         retries = 3
         backoff = 1.0

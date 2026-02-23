@@ -115,7 +115,7 @@ def compute_momentum_score(item: RadarItem) -> float:
 
 
 def compute_cool_score(item: RadarItem) -> float:
-    """Placeholder cool score. 0.5 baseline, +0.1 if has tags."""
+    """Cool score: 0.5 baseline, +0.1 if has tags, +0.2 if Show HN."""
     score = 0.5
     tags = item.tags_json
     if isinstance(tags, str):
@@ -125,24 +125,28 @@ def compute_cool_score(item: RadarItem) -> float:
             tags = {}
     if isinstance(tags, dict) and (tags.get("domains") or tags.get("languages")):
         score += 0.1
+    signals = get_signals(item)
+    if signals.get("is_show_hn"):
+        score += 0.2
     return min(1.0, max(0.0, score))
 
 
 def compute_buildability_score(item: RadarItem) -> float:
-    """Compute buildability based on GitHub metadata presence."""
+    """Compute buildability based on GitHub metadata presence and star count."""
     score = 0.0
     signals = get_signals(item)
     if item.github_full_name:
         score = 0.5
         if item.title and len(item.title) > 20:
             score += 0.1
-        if signals.get("github_stars_total", 0) and signals["github_stars_total"] > 0:
-            score += 0.1
+        stars = signals.get("github_stars_total") or 0
+        if stars > 0:
+            # Log-scale: 100 stars → ~0.07, 1k → ~0.10, 10k → ~0.14, 50k → ~0.16
+            score += 0.2 * min(1.0, math.log(max(1, stars)) / math.log(50000))
     else:
         # Non-GitHub items: partial score based on URL quality
         score = 0.2
-    signals_data = signals
-    if signals_data.get("hn_points", 0) and signals_data["hn_points"] > 10:
+    if signals.get("hn_points", 0) and signals["hn_points"] > 10:
         score += 0.1
     return min(1.0, max(0.0, score))
 
