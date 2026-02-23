@@ -446,6 +446,54 @@
         font-family: system-ui, sans-serif;
       }
 
+      /* ---- date navigation ---- */
+      .date-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .date-nav-btn {
+        background: #fffaf3;
+        border: 1px solid #eadfcd;
+        border-radius: 6px;
+        color: #3d2b1a;
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+        padding: 5px 13px;
+        transition: background 0.15s, border-color 0.15s;
+      }
+
+      .date-nav-btn:hover:not(:disabled) {
+        background: #b8884a;
+        border-color: #b8884a;
+        color: #fff;
+      }
+
+      .date-nav-btn:disabled {
+        opacity: 0.35;
+        cursor: default;
+      }
+
+      .date-display {
+        font-size: 0.9rem;
+        color: #8a6a50;
+        font-weight: 500;
+        min-width: 190px;
+        text-align: center;
+      }
+
+      .date-today-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #b8884a;
+        margin-right: 4px;
+      }
+
       /* ====================================================
          TAB 3 — BUILD PAIRINGS
          ==================================================== */
@@ -849,7 +897,48 @@
          TAB 2: TODAY'S 7
          ============================================== */
 
-      var todayLoaded = false;
+      var todayLoadedDate = null;   // which date is currently rendered
+      var currentPicksDate = null;  // set on first load
+
+      /* ---- date helpers ---- */
+      function todayStr() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function addDays(dateStr, n) {
+        var d = new Date(dateStr + 'T00:00:00Z');
+        d.setUTCDate(d.getUTCDate() + n);
+        return d.toISOString().slice(0, 10);
+      }
+
+      function formatDateLong(dateStr) {
+        var d = new Date(dateStr + 'T00:00:00Z');
+        return d.toLocaleDateString('en-US', {
+          weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+        });
+      }
+
+      function renderDateNav(dateStr) {
+        var isToday = (dateStr === todayStr());
+        var html = '<div class="date-nav">';
+        html += '<button class="date-nav-btn" onclick="navigateDate(-1)" title="Previous day">&#8592;</button>';
+        html += '<span class="date-display">';
+        if (isToday) html += '<span class="date-today-label">Today</span>';
+        html += escapeHtml(formatDateLong(dateStr));
+        html += '</span>';
+        html += '<button class="date-nav-btn" onclick="navigateDate(1)"'
+              + (isToday ? ' disabled' : '') + ' title="Next day">&#8594;</button>';
+        html += '</div>';
+        return html;
+      }
+
+      function navigateDate(delta) {
+        var newDate = addDays(currentPicksDate, delta);
+        if (newDate > todayStr()) return;
+        stopAnalyzePolling();
+        todayLoadedDate = null; // allow re-fetch
+        fetchToday(newDate);
+      }
 
       function sourceBadgeHTML(source) {
         if (!source) return '';
@@ -875,15 +964,16 @@
           .replace(/"/g, '&quot;');
       }
 
-      function renderToday(data) {
+      function renderToday(data, dateStr) {
         var container = document.getElementById('today-content');
-        var date = data.date || '';
+        var date = dateStr || data.date || todayStr();
         var items = data.items || [];
 
         var updatedAt = data.updated_at ? new Date(data.updated_at).toLocaleString() : null;
         var html = '';
         html += '<h2 class="radar-section-title">Today\'s Picks</h2>';
-        html += '<p class="radar-subtitle">Curated daily picks \u00b7 ' + escapeHtml(date);
+        html += renderDateNav(date);
+        html += '<p class="radar-subtitle">Curated daily picks';
         if (updatedAt) html += ' \u00b7 Updated ' + escapeHtml(updatedAt);
         html += '</p>';
 
@@ -1025,7 +1115,9 @@
           });
 
           if (newlyCompleted.length > 0) {
-            var todayRes = await fetch('/api/today');
+            var isCurrentToday = (!currentPicksDate || currentPicksDate === todayStr());
+            var patchUrl = '/api/today' + (isCurrentToday ? '' : '?date=' + currentPicksDate);
+            var todayRes = await fetch(patchUrl);
             var todayData = await todayRes.json();
             newlyCompleted.forEach(function(itemId) {
               var newItem = (todayData.items || []).find(function(it) { return it.id === itemId; });
@@ -1047,11 +1139,19 @@
         }
       }
 
-      async function fetchToday() {
-        if (todayLoaded) return;
-        todayLoaded = true;
+      async function fetchToday(dateStr) {
+        if (!dateStr) dateStr = todayStr();
+        if (todayLoadedDate === dateStr) return;
+        currentPicksDate = dateStr;
+        todayLoadedDate = dateStr;
+
+        document.getElementById('today-content').innerHTML = '<p class="loading-state">Loading\u2026</p>';
+
+        var isToday = (dateStr === todayStr());
+        var url = '/api/today' + (isToday ? '' : '?date=' + dateStr);
+
         try {
-          var res = await fetch('/api/today');
+          var res = await fetch(url);
           var data = await res.json();
 
           // Seed known-completed set before rendering
@@ -1060,22 +1160,24 @@
             if (item.analysis) knownCompleted.add(item.id);
           });
 
-          renderToday(data);
+          renderToday(data, dateStr);
 
-          // Check analysis status and start polling if not done
-          try {
-            var statusRes = await fetch('/api/analyze/status');
-            var statusData = await statusRes.json();
-            updateStatusBar(statusData);
-            if (!statusData.done && statusData.total > 0) {
-              startAnalyzePolling();
+          // Only poll analysis progress when viewing today
+          if (isToday) {
+            try {
+              var statusRes = await fetch('/api/analyze/status');
+              var statusData = await statusRes.json();
+              updateStatusBar(statusData);
+              if (!statusData.done && statusData.total > 0) {
+                startAnalyzePolling();
+              }
+            } catch (e) {
+              // Status endpoint unavailable, skip polling
             }
-          } catch (e) {
-            // Status endpoint unavailable, skip polling
           }
         } catch (err) {
           document.getElementById('today-content').innerHTML =
-            '<div class="empty-state">Failed to load today\'s picks. Is the server running?</div>';
+            '<div class="empty-state">Failed to load picks. Is the server running?</div>';
         }
       }
 
