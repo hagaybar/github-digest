@@ -278,6 +278,7 @@ def run_orchestrate_daily(
     dry_run: bool = False,
     skip_github: bool = False,
     skip_hn: bool = False,
+    skip_reddit: bool = False,
     skip_analyze: bool = False,
     skip_pair: bool = False,
 ) -> dict[str, Any]:
@@ -317,6 +318,8 @@ def run_orchestrate_daily(
             steps.append("fetch (GitHub repos)")
         if not skip_hn:
             steps.append("ingest-hn")
+        if not skip_reddit:
+            steps.append("ingest-reddit")
         steps.extend([
             f"rank-daily --date {date_str}",
             f"analyze-daily --date {date_str}  (queue populate)",
@@ -373,6 +376,10 @@ def run_orchestrate_daily(
         # Step 2: Ingest HN
         if not skip_hn:
             results["steps"]["ingest_hn"] = run_step("ingest-hn", ["ingest-hn"])
+
+        # Step 2b: Ingest Reddit
+        if not skip_reddit:
+            results["steps"]["ingest_reddit"] = run_step("ingest-reddit", ["ingest-reddit"])
 
         # Step 3: Rank daily
         results["steps"]["rank_daily"] = run_step("rank-daily", ["rank-daily", "--date", date_str])

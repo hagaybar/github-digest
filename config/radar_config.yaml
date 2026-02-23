@@ -7,6 +7,7 @@ ranking:
   top_k_for_llm: 30
   daily_picks_count: 7
   candidate_window_hours: 48
+  reuse_exclusion_days: 3  # exclude items picked in the last N days to ensure fresh picks
 ingestion:
   hn_fetch_interval_hours: 2
   hn_top_stories_count: 100

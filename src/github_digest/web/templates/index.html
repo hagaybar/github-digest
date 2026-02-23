@@ -320,6 +320,11 @@
         color: #fff;
       }
 
+      .source-badge.reddit {
+        background: #ff4500;
+        color: #fff;
+      }
+
       .radar-card h2 {
         margin: 0 0 6px;
         font-size: 17px;
@@ -951,6 +956,9 @@
         } else if (s === 'github') {
           cls = 'github';
           label = 'GitHub';
+        } else if (s === 'reddit') {
+          cls = 'reddit';
+          label = 'Reddit';
         }
         return '<span class="source-badge ' + cls + '">' + escapeHtml(label) + '</span>';
       }

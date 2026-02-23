@@ -102,12 +102,16 @@ def deduplicate_items(items: list[RadarItem]) -> list[RadarItem]:
 
 
 def compute_momentum_score(item: RadarItem) -> float:
-    """Compute momentum score from HN points and GitHub velocity."""
+    """Compute momentum score from social signals (HN, Reddit) and GitHub velocity."""
     signals = get_signals(item)
     momentum = 0.0
     hn_points = signals.get("hn_points") or 0
     if hn_points > 0:
         momentum += math.log(max(1, hn_points)) / math.log(1000)
+    reddit_score = signals.get("reddit_score") or 0
+    if reddit_score > 0:
+        # Reddit scores tend to be lower than HN; cap contribution at 0.4
+        momentum += 0.4 * min(1.0, math.log(max(1, reddit_score)) / math.log(1000))
     velocity = signals.get("github_velocity") or 0
     if velocity > 0:
         momentum += min(1.0, velocity / 100)
@@ -224,6 +228,26 @@ def rank_candidates(
         # Deduplicate
         items = deduplicate_items(items)
         logger.info("%d items after deduplication", len(items))
+
+        # Exclude items already picked on previous days (keep today's picks fresh)
+        reuse_window_days = ranking_cfg.get("reuse_exclusion_days", 3)
+        if reuse_window_days > 0:
+            excl_cutoff = (datetime.now(UTC) - timedelta(days=reuse_window_days)).strftime("%Y-%m-%d")
+            excl_rows = session.execute(
+                text("""
+                    SELECT DISTINCT item_id FROM daily_picks
+                    WHERE date >= :cutoff AND date < :today
+                """),
+                {"cutoff": excl_cutoff, "today": date_str},
+            ).fetchall()
+            excluded_ids = {r[0] for r in excl_rows}
+            if excluded_ids:
+                before = len(items)
+                items = [it for it in items if it.id not in excluded_ids]
+                logger.info(
+                    "Excluded %d recently-picked items (%d remain)",
+                    before - len(items), len(items),
+                )
 
         # Score each item and update DB
         scored = []

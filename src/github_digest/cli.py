@@ -87,6 +87,20 @@ def cmd_ingest_hn(args: argparse.Namespace) -> None:
     logger.info("HN ingestion result: %s", result)
 
 
+def cmd_ingest_reddit(args: argparse.Namespace) -> None:
+    """Ingest Reddit posts from curated builder subreddits into DB."""
+    from github_digest.radar.reddit_ingestion import DEFAULT_SUBREDDITS, ingest_reddit
+    subreddits = getattr(args, "subreddits", None) or DEFAULT_SUBREDDITS
+    result = ingest_reddit(
+        settings.db_path,
+        subreddits=subreddits,
+        limit_per_sub=25,
+        github_token=settings.github_token,
+    )
+    logger.info("Reddit ingestion result: %s", result)
+    print(json.dumps(result))
+
+
 def cmd_rank_daily(args: argparse.Namespace) -> None:
     """Score and rank items, write daily picks."""
     from github_digest.radar.ranking import rank_candidates
@@ -131,6 +145,7 @@ def cmd_orchestrate_daily(args: argparse.Namespace) -> None:
         dry_run=getattr(args, 'dry_run', False),
         skip_github=getattr(args, 'skip_github', False),
         skip_hn=getattr(args, 'skip_hn', False),
+        skip_reddit=getattr(args, 'skip_reddit', False),
         skip_analyze=getattr(args, 'skip_analyze', False),
         skip_pair=getattr(args, 'skip_pair', False),
     )
@@ -246,6 +261,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_ingest_hn = sub.add_parser("ingest-hn", help="Ingest Hacker News stories")
     p_ingest_hn.set_defaults(func=cmd_ingest_hn)
 
+    # ingest-reddit
+    p_ingest_reddit = sub.add_parser("ingest-reddit", help="Ingest Reddit posts from builder subreddits")
+    p_ingest_reddit.add_argument(
+        "--subreddits", nargs="+", default=None,
+        help="Subreddits to fetch (default: SideProject coolgithubprojects MachineLearning)",
+    )
+    p_ingest_reddit.set_defaults(func=cmd_ingest_reddit)
+
     # rank-daily
     p_rank = sub.add_parser("rank-daily", help="Score and rank items, write daily picks")
     p_rank.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
@@ -274,6 +297,7 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Print steps that would run without executing")
     p_orch.add_argument("--skip-github", action="store_true", default=False, dest="skip_github")
     p_orch.add_argument("--skip-hn", action="store_true", default=False, dest="skip_hn")
+    p_orch.add_argument("--skip-reddit", action="store_true", default=False, dest="skip_reddit")
     p_orch.add_argument("--skip-analyze", action="store_true", default=False, dest="skip_analyze",
                         help="Skip launching analyze-worker")
     p_orch.add_argument("--skip-pair", action="store_true", default=False, dest="skip_pair")
