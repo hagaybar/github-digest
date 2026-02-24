@@ -89,6 +89,8 @@ def cmd_ingest_hn(args: argparse.Namespace) -> None:
 
 def cmd_ingest_reddit(args: argparse.Namespace) -> None:
     """Ingest Reddit posts from curated builder subreddits into DB."""
+    import sys
+    print("WARNING: Reddit ingestion is 403-blocked. Consider using 'ingest-devto' instead.", file=sys.stderr)
     from github_digest.radar.reddit_ingestion import DEFAULT_SUBREDDITS, ingest_reddit
     subreddits = getattr(args, "subreddits", None) or DEFAULT_SUBREDDITS
     result = ingest_reddit(
@@ -99,6 +101,15 @@ def cmd_ingest_reddit(args: argparse.Namespace) -> None:
     )
     logger.info("Reddit ingestion result: %s", result)
     print(json.dumps(result))
+
+
+def cmd_ingest_devto(args: argparse.Namespace) -> None:
+    """Ingest DEV.to articles into DB."""
+    from github_digest.radar.devto_ingestion import ingest_devto
+    tags_raw = getattr(args, "tags", None)
+    tags_list = [t.strip() for t in tags_raw.split(",")] if tags_raw else None
+    result = ingest_devto(db_path=settings.db_path, tags=tags_list, github_token=settings.github_token)
+    print(f"Ingested {result['ingested']} DEV.to articles ({result['github_linked']} GitHub-linked)")
 
 
 def cmd_rank_daily(args: argparse.Namespace) -> None:
@@ -269,6 +280,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_ingest_reddit.set_defaults(func=cmd_ingest_reddit)
 
+    # ingest-devto
+    p_ingest_devto = sub.add_parser("ingest-devto", help="Ingest DEV.to articles")
+    p_ingest_devto.add_argument(
+        "--tags", default=None,
+        help="Comma-separated list of DEV.to tags to fetch (default: None, uses module defaults)",
+    )
+    p_ingest_devto.set_defaults(func=cmd_ingest_devto)
+
     # rank-daily
     p_rank = sub.add_parser("rank-daily", help="Score and rank items, write daily picks")
     p_rank.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
@@ -336,6 +355,8 @@ def main() -> None:
         cmd_ingest_hn(args)
     elif args.command == "ingest-reddit":
         cmd_ingest_reddit(args)
+    elif args.command == "ingest-devto":
+        cmd_ingest_devto(args)
     elif args.command == "rank-daily":
         cmd_rank_daily(args)
     elif args.command == "analyze-daily":

@@ -325,6 +325,8 @@
         color: #fff;
       }
 
+      .source-badge.devto { background: #3b49df; color: #fff; }
+
       .radar-card h2 {
         margin: 0 0 6px;
         font-size: 17px;
@@ -959,6 +961,9 @@
         } else if (s === 'reddit') {
           cls = 'reddit';
           label = 'Reddit';
+        } else if (s === 'devto') {
+          cls = 'devto';
+          label = 'DEV.to';
         }
         return '<span class="source-badge ' + cls + '">' + escapeHtml(label) + '</span>';
       }
@@ -1014,6 +1019,7 @@
           var sigParts = [];
           if (signals.github_stars_total) sigParts.push('\u2B50 ' + Number(signals.github_stars_total).toLocaleString() + ' stars');
           if (signals.hn_points) sigParts.push('\uD83D\uDD3A ' + signals.hn_points + ' pts');
+          if (signals.devto_reactions) sigParts.push('\u2764 ' + signals.devto_reactions + ' DEV reactions');
           if (sigParts.length) {
             html += '<div class="signals-row">' + sigParts.join(' \u00b7 ') + '</div>';
           }

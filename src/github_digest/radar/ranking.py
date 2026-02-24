@@ -112,6 +112,10 @@ def compute_momentum_score(item: RadarItem) -> float:
     if reddit_score > 0:
         # Reddit scores tend to be lower than HN; cap contribution at 0.4
         momentum += 0.4 * min(1.0, math.log(max(1, reddit_score)) / math.log(1000))
+    devto_reactions = signals.get("devto_reactions") or 0
+    if devto_reactions > 0:
+        # DEV.to reactions: similar scale to reddit; cap contribution at 0.3
+        momentum += 0.3 * min(1.0, math.log(max(1, devto_reactions)) / math.log(1000))
     velocity = signals.get("github_velocity") or 0
     if velocity > 0:
         momentum += min(1.0, velocity / 100)

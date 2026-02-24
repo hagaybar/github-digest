@@ -18,6 +18,8 @@
     .card h2 a { color: #2a2a2a; text-decoration: none; }
     .card h2 a:hover { text-decoration: underline; }
     .source-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #eadfcd; color: #6a5d54; margin-bottom: 10px; }
+    .source-badge.hn { background: #ff6600; color: #fff; }
+    .source-badge.devto { background: #3b49df; color: #fff; }
     .unlock { font-style: italic; color: #4a3f36; margin: 8px 0; font-size: 14px; }
     .novelty { color: #6a5d54; font-size: 13px; margin: 4px 0 8px; }
     .why-cool { list-style: none; padding: 0; margin: 8px 0; }
@@ -50,7 +52,7 @@
   <div class="cards">
     {% for item in items %}
     <div class="card">
-      <span class="source-badge">{{ item.source }}</span>
+      <span class="source-badge {% if item.source == 'hackernews' %}hn{% elif item.source == 'devto' %}devto{% endif %}">{% if item.source == 'hackernews' %}HN{% elif item.source == 'devto' %}DEV.to{% else %}{{ item.source }}{% endif %}</span>
       <h2><a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a></h2>
 
       {% if item.analysis %}
@@ -89,6 +91,7 @@
         {% if item.signals.hn_points %}&#11014; {{ item.signals.hn_points }} HN pts{% endif %}
         {% if item.signals.github_stars_total %} &middot; &#11088; {{ item.signals.github_stars_total }}{% endif %}
         {% if item.github_full_name %} &middot; <a href="https://github.com/{{ item.github_full_name }}" target="_blank">{{ item.github_full_name }}</a>{% endif %}
+        {% if item.signals.devto_reactions %} &middot; &#10084; {{ item.signals.devto_reactions }} DEV reactions{% endif %}
       </div>
     </div>
     {% endfor %}

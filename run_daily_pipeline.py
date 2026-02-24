@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 Daily pipeline orchestrator for Builder Radar.
-Runs the full pipeline: ingest_github, ingest_hn, rank_daily, analyze_daily, pair_daily.
+Runs the full pipeline: ingest_github, ingest_hn, ingest_devto, rank_daily, analyze_daily, pair_daily.
 
 Usage:
-    python3 run_daily_pipeline.py [--date YYYY-MM-DD] [--skip-github] [--skip-hn] [--skip-llm]
+    python3 run_daily_pipeline.py [--date YYYY-MM-DD] [--skip-github] [--skip-hn] [--skip-devto] [--skip-llm]
 """
 from __future__ import annotations
 
@@ -31,6 +31,8 @@ def main() -> int:
                         help="Skip GitHub ingestion step")
     parser.add_argument("--skip-hn", action="store_true", default=False, dest="skip_hn",
                         help="Skip HN ingestion step")
+    parser.add_argument("--skip-devto", action="store_true", default=False, dest="skip_devto",
+                        help="Skip DEV.to ingestion step")
     parser.add_argument("--skip-llm", action="store_true", default=False, dest="skip_llm",
                         help="Skip launching the background LLM analysis worker")
     args = parser.parse_args()
@@ -75,6 +77,20 @@ def main() -> int:
             errors.append(f"hn: {e}")
     else:
         logger.info("=== Step 2: Skipping HN ingestion ===")
+
+    # Step 2b: Ingest DEV.to
+    # DEV.to ingestion: replaces Reddit (Reddit 403-blocks server IPs)
+    if not args.skip_devto:
+        logger.info("=== Step 2b: Ingest DEV.to ===")
+        try:
+            from github_digest.radar.devto_ingestion import ingest_devto
+            result = ingest_devto(db_path)
+            logger.info("DEV.to ingestion: %s", result)
+        except Exception as e:
+            logger.error("DEV.to ingestion failed: %s", e)
+            errors.append(f"devto: {e}")
+    else:
+        logger.info("=== Step 2b: Skipping DEV.to ingestion ===")
 
     # Step 3: Rank daily
     logger.info("=== Step 3: Rank daily (date=%s) ===", date_str)
