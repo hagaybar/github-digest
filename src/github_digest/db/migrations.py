@@ -223,6 +223,7 @@ def migrate(engine: Engine) -> None:
 
     # radar_item_analysis: add queue tracking columns
     if _table_exists(engine, "radar_item_analysis"):
+        columns_added = 0
         for col, col_type, default in [
             ("status", "TEXT", "'pending'"),
             ("attempts", "INTEGER", "0"),
@@ -240,13 +241,15 @@ def migrate(engine: Engine) -> None:
                         conn.execute(text(
                             f"ALTER TABLE radar_item_analysis ADD COLUMN {col} {col_type}"
                         ))
-        # Backfill existing rows (idempotent: only affects rows still at default 'pending')
-        with engine.begin() as conn:
-            conn.execute(text(
-                "UPDATE radar_item_analysis SET status='completed' "
-                "WHERE analysis_json IS NOT NULL AND status='pending'"
-            ))
-            conn.execute(text(
-                "UPDATE radar_item_analysis SET status='failed' "
-                "WHERE analysis_json IS NULL AND status='pending'"
-            ))
+                columns_added += 1
+        # Backfill existing rows only when columns were newly added (one-time migration)
+        if columns_added > 0:
+            with engine.begin() as conn:
+                conn.execute(text(
+                    "UPDATE radar_item_analysis SET status='completed' "
+                    "WHERE analysis_json IS NOT NULL AND status='pending'"
+                ))
+                conn.execute(text(
+                    "UPDATE radar_item_analysis SET status='failed' "
+                    "WHERE analysis_json IS NULL AND status='pending'"
+                ))
