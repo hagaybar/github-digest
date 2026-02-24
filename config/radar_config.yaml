@@ -8,6 +8,7 @@ ranking:
   daily_picks_count: 7
   candidate_window_hours: 48
   reuse_exclusion_days: 3  # exclude items picked in the last N days to ensure fresh picks
+  max_picks_per_source: 5  # limits any single source to at most 5 of the 7 daily picks, guaranteeing at least 2 picks from other sources
 ingestion:
   hn_fetch_interval_hours: 2
   hn_top_stories_count: 100

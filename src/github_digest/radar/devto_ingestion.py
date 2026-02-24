@@ -109,6 +109,18 @@ def article_to_radar_item_data(article: dict) -> dict | None:
         description = article.get("description") or ""
         github_full_name = extract_github_repo_from_text(description)
 
+    # Lazy fallback: fetch article body to find GitHub links
+    if not github_full_name:
+        body = fetch_devto_article_body(article["id"])
+        if body:
+            match = _GITHUB_REPO_RE.search(body)
+            if match:
+                candidate = match.group(1).rstrip("/")
+                # Validate it's a real owner/repo (not a path like owner/repo/blob/...)
+                parts = candidate.split("/")
+                if len(parts) == 2:
+                    github_full_name = candidate
+
     published_at = None
     published_str = article.get("published_at")
     if published_str:
@@ -137,6 +149,19 @@ def article_to_radar_item_data(article: dict) -> dict | None:
         "github_full_name": github_full_name,
         "signals_json": signals,
     }
+
+
+def fetch_devto_article_body(article_id: int) -> str:
+    """Fetch the full body_markdown for a single DEV.to article."""
+    url = f"https://dev.to/api/articles/{article_id}"
+    try:
+        with httpx.Client(timeout=15, follow_redirects=True) as client:
+            resp = client.get(url, headers={"User-Agent": _USER_AGENT})
+            resp.raise_for_status()
+            return resp.json().get("body_markdown", "") or ""
+    except Exception as e:
+        logger.warning("Failed to fetch article body for id=%d: %s", article_id, e)
+        return ""
 
 
 def ingest_devto(

@@ -267,7 +267,30 @@ def rank_candidates(
         scored.sort(key=lambda x: x[1]["final_score"], reverse=True)
 
         top_k_items = scored[:top_k]
-        top_7_items = scored[:daily_count]
+
+        # Enforce source diversity: no single source takes more than max_per_source picks
+        max_per_source = ranking_cfg.get("max_picks_per_source", 5)
+        if max_per_source < daily_count:
+            source_counts: dict[str, int] = {}
+            diverse_picks = []
+            overflow = []
+            for item, scores in scored:
+                src = item.source
+                count = source_counts.get(src, 0)
+                if count < max_per_source:
+                    diverse_picks.append((item, scores))
+                    source_counts[src] = count + 1
+                else:
+                    overflow.append((item, scores))
+                if len(diverse_picks) >= daily_count:
+                    break
+            # If we still need more, fill from overflow (maintaining score order)
+            if len(diverse_picks) < daily_count:
+                overflow.sort(key=lambda x: x[1]["final_score"], reverse=True)
+                diverse_picks.extend(overflow[:daily_count - len(diverse_picks)])
+            top_7_items = diverse_picks[:daily_count]
+        else:
+            top_7_items = scored[:daily_count]
 
         # Log top ranked titles
         top_titles = [
