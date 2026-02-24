@@ -221,8 +221,7 @@ def atom_feed(db: Session = Depends(get_session)) -> Response:
 
 def _get_today_items(db: Session, date_str: str) -> list[dict]:
     """Query daily picks with their analysis for a given date."""
-    rows = db.execute(
-        text("""
+    _PICKS_QUERY = """
             SELECT ri.id, ri.source, ri.url, ri.title, ri.github_full_name,
                    ri.signals_json, ri.scores_json, ria.analysis_json,
                    dp.rank
@@ -231,9 +230,21 @@ def _get_today_items(db: Session, date_str: str) -> list[dict]:
             LEFT JOIN radar_item_analysis ria ON ria.item_id = ri.id AND ria.analysis_version = 'v1'
             WHERE dp.date = :date
             ORDER BY dp.rank ASC
-        """),
-        {"date": date_str},
-    ).fetchall()
+        """
+    rows = db.execute(text(_PICKS_QUERY), {"date": date_str}).fetchall()
+
+    # Fallback to most recent date with picks when today has none
+    is_fallback = False
+    actual_date = date_str
+    if not rows:
+        fallback_date = db.scalar(
+            text("SELECT MAX(date) FROM daily_picks WHERE date < :d"),
+            {"d": date_str},
+        )
+        if fallback_date:
+            actual_date = str(fallback_date)
+            rows = db.execute(text(_PICKS_QUERY), {"date": actual_date}).fetchall()
+            is_fallback = True
 
     import json
     items = []
@@ -262,6 +273,8 @@ def _get_today_items(db: Session, date_str: str) -> list[dict]:
             "signals": signals,
             "analysis": analysis,
             "rank": row[8],
+            "is_fallback": is_fallback,
+            "actual_date": actual_date,
         })
     return items
 
@@ -385,7 +398,13 @@ def api_today(
         {"date": date_str},
     ).scalar()
     updated_at = str(row) if row else None
-    return {"date": date_str, "updated_at": updated_at, "items": items}
+    return {
+        "date": date_str,
+        "updated_at": updated_at,
+        "items": items,
+        "is_fallback": any(i.get("is_fallback") for i in items),
+        "actual_date": items[0]["actual_date"] if items else date_str,
+    }
 
 
 @app.get("/api/build")

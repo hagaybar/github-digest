@@ -326,6 +326,8 @@
       }
 
       .source-badge.devto { background: #3b49df; color: #fff; }
+      .source-badge.trending { background: #1a7f37; color: #fff; }
+      .source-badge.ph { background: #da552f; color: #fff; }
 
       .radar-card h2 {
         margin: 0 0 6px;
@@ -964,6 +966,12 @@
         } else if (s === 'devto') {
           cls = 'devto';
           label = 'DEV.to';
+        } else if (s === 'github_trending') {
+          cls = 'trending';
+          label = 'Trending';
+        } else if (s === 'producthunt') {
+          cls = 'ph';
+          label = 'Product Hunt';
         }
         return '<span class="source-badge ' + cls + '">' + escapeHtml(label) + '</span>';
       }
@@ -989,6 +997,10 @@
         html += '<p class="radar-subtitle">Curated daily picks';
         if (updatedAt) html += ' \u00b7 Updated ' + escapeHtml(updatedAt);
         html += '</p>';
+
+        if (data.is_fallback && data.actual_date) {
+          html += '<p style="color:#a08060;font-size:13px;margin:-12px 0 16px;font-style:italic;">&#8634; Showing picks from ' + escapeHtml(data.actual_date) + ' \u2014 today\'s pipeline hasn\'t run yet.</p>';
+        }
 
         if (items.length === 0) {
           html += '<div class="empty-state">No picks yet for today \u2014 pipeline hasn\'t run.</div>';
@@ -1018,6 +1030,7 @@
           // Signals row
           var sigParts = [];
           if (signals.github_stars_total) sigParts.push('\u2B50 ' + Number(signals.github_stars_total).toLocaleString() + ' stars');
+          if (signals.github_trending_delta) sigParts.push('\u2B50 +' + signals.github_trending_delta + ' today');
           if (signals.hn_points) sigParts.push('\uD83D\uDD3A ' + signals.hn_points + ' pts');
           if (signals.devto_reactions) sigParts.push('\u2764 ' + signals.devto_reactions + ' DEV reactions');
           if (sigParts.length) {

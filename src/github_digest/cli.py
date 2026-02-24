@@ -112,12 +112,42 @@ def cmd_ingest_devto(args: argparse.Namespace) -> None:
     print(f"Ingested {result['ingested']} DEV.to articles ({result['github_linked']} GitHub-linked)")
 
 
+def cmd_ingest_producthunt(args: argparse.Namespace) -> None:
+    """Ingest Product Hunt RSS feed into DB."""
+    from github_digest.radar.producthunt_ingestion import ingest_producthunt
+    result = ingest_producthunt(db_path=settings.db_path, github_token=settings.github_token)
+    print(f"Ingested {result['ingested']} Product Hunt items ({result['github_linked']} GitHub-linked)")
+
+
+def cmd_ingest_github_trending(args: argparse.Namespace) -> None:
+    """Ingest GitHub Trending repos (daily + weekly) into DB."""
+    from github_digest.radar.github_trending_ingestion import ingest_github_trending
+    result = ingest_github_trending(
+        db_path=settings.db_path,
+        github_token=settings.github_token,
+    )
+    print(
+        f"Ingested {result['ingested']} GitHub Trending repos "
+        f"(daily={result['daily']}, weekly={result['weekly']}, "
+        f"github_enriched={result['github_enriched']})"
+    )
+    print(json.dumps(result))
+
+
 def cmd_rank_daily(args: argparse.Namespace) -> None:
     """Score and rank items, write daily picks."""
     from github_digest.radar.ranking import rank_candidates
     config_path = Path("config/radar_config.yaml")
     result = rank_candidates(settings.db_path, config_path, date_str=getattr(args, 'date', None))
     logger.info("Ranking result: %s", result)
+
+
+def cmd_rank_refresh(args: argparse.Namespace) -> None:
+    """Re-score 48h candidates and refresh daily picks if better items found."""
+    from github_digest.radar.ranking import rank_refresh
+    config_path = Path("config/radar_config.yaml")
+    result = rank_refresh(settings.db_path, config_path, date_str=getattr(args, 'date', None))
+    logger.info("Rank refresh result: %s", result)
 
 
 def cmd_analyze_daily(args: argparse.Namespace) -> None:
@@ -288,10 +318,29 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_ingest_devto.set_defaults(func=cmd_ingest_devto)
 
+    # ingest-producthunt
+    p_ingest_producthunt = sub.add_parser("ingest-producthunt", help="Ingest Product Hunt RSS feed")
+    p_ingest_producthunt.set_defaults(func=cmd_ingest_producthunt)
+
+    # ingest-github-trending
+    p_ingest_trending = sub.add_parser(
+        "ingest-github-trending",
+        help="Ingest GitHub Trending repos (daily + weekly)",
+    )
+    p_ingest_trending.set_defaults(func=cmd_ingest_github_trending)
+
     # rank-daily
     p_rank = sub.add_parser("rank-daily", help="Score and rank items, write daily picks")
     p_rank.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
     p_rank.set_defaults(func=cmd_rank_daily)
+
+    # rank-refresh
+    p_rank_refresh = sub.add_parser(
+        "rank-refresh",
+        help="Intra-day re-score candidates and replace picks that score significantly higher",
+    )
+    p_rank_refresh.add_argument("--date", default=None, help="Date YYYY-MM-DD (default: today)")
+    p_rank_refresh.set_defaults(func=cmd_rank_refresh)
 
     # analyze-daily
     p_analyze = sub.add_parser("analyze-daily", help="Populate analysis queue for daily picks (fast, no LLM)")
@@ -357,8 +406,14 @@ def main() -> None:
         cmd_ingest_reddit(args)
     elif args.command == "ingest-devto":
         cmd_ingest_devto(args)
+    elif args.command == "ingest-producthunt":
+        cmd_ingest_producthunt(args)
+    elif args.command == "ingest-github-trending":
+        cmd_ingest_github_trending(args)
     elif args.command == "rank-daily":
         cmd_rank_daily(args)
+    elif args.command == "rank-refresh":
+        cmd_rank_refresh(args)
     elif args.command == "analyze-daily":
         cmd_analyze_daily(args)
     elif args.command == "analyze-worker":

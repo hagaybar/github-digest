@@ -9,9 +9,12 @@ ranking:
   candidate_window_hours: 48
   reuse_exclusion_days: 3  # exclude items picked in the last N days to ensure fresh picks
   max_picks_per_source: 5  # limits any single source to at most 5 of the 7 daily picks, guaranteeing at least 2 picks from other sources
+  min_score_delta_for_refresh: 0.05  # minimum score improvement required to replace an existing pick during intra-day refresh
 ingestion:
   hn_fetch_interval_hours: 2
   hn_top_stories_count: 100
+  github_trending_fetch_interval_hours: 2
+  producthunt_fetch_interval_hours: 6
 llm:
   enable_llm: true  # set to true to use LLM analysis
   model: "llama3.2"

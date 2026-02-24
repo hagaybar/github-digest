@@ -116,6 +116,10 @@ def compute_momentum_score(item: RadarItem) -> float:
     if devto_reactions > 0:
         # DEV.to reactions: similar scale to reddit; cap contribution at 0.3
         momentum += 0.3 * min(1.0, math.log(max(1, devto_reactions)) / math.log(1000))
+    trending_delta = signals.get("github_trending_delta") or 0
+    if trending_delta > 0:
+        # GitHub Trending delta stars: log-scale, cap at 0.4
+        momentum += 0.4 * min(1.0, math.log(max(1, trending_delta)) / math.log(5000))
     velocity = signals.get("github_velocity") or 0
     if velocity > 0:
         momentum += min(1.0, velocity / 100)
@@ -327,4 +331,209 @@ def rank_candidates(
         "top_k": len(top_k_items),
         "daily_picks": len(top_7_items),
         "date": date_str,
+    }
+
+
+def rank_refresh(
+    db_path: Path,
+    config_path: Path,
+    date_str: str | None = None,
+) -> dict:
+    """Re-score all 48h candidates and replace any daily pick that scores
+    min_score_delta_for_refresh higher. Runs fast (no LLM). Returns dict of stats."""
+
+    if date_str is None:
+        date_str = datetime.now(UTC).strftime("%Y-%m-%d")
+
+    config = load_radar_config(config_path)
+    weights = config.get("scoring", {}).get("weights", {})
+    ranking_cfg = config.get("ranking", {})
+    daily_count = ranking_cfg.get("daily_picks_count", 7)
+    window_hours = ranking_cfg.get("candidate_window_hours", 48)
+    reuse_window_days = ranking_cfg.get("reuse_exclusion_days", 3)
+    max_per_source = ranking_cfg.get("max_picks_per_source", 5)
+    min_score_delta = ranking_cfg.get("min_score_delta_for_refresh", 0.05)
+
+    engine = get_engine(db_path)
+
+    with Session(engine) as session:
+        # Check current picks for this date
+        current_rows = session.execute(
+            text("""
+                SELECT dp.item_id, dp.rank
+                FROM daily_picks dp
+                WHERE dp.date = :date
+                ORDER BY dp.rank
+            """),
+            {"date": date_str},
+        ).fetchall()
+
+        # If no picks exist yet, delegate to rank_candidates (first run)
+        if len(current_rows) == 0:
+            logger.info("No picks found for %s — delegating to rank_candidates()", date_str)
+            rank_candidates(db_path, config_path, date_str=date_str)
+            return {
+                "date": date_str,
+                "candidates": 0,
+                "replaced": 0,
+                "picks_unchanged": 0,
+                "first_run": True,
+            }
+
+        current_item_ids = [r[0] for r in current_rows]
+
+        # Query recent candidates (same window as rank_candidates)
+        cutoff = datetime.now(UTC) - timedelta(hours=window_hours)
+        rows = session.execute(
+            text("""
+                SELECT id, source, source_id, url, title, published_at, collected_at,
+                       github_full_name, signals_json, tags_json, scores_json
+                FROM radar_items
+                WHERE collected_at >= :cutoff
+            """),
+            {"cutoff": cutoff.isoformat()},
+        ).fetchall()
+
+        items = []
+        for row in rows:
+            item = RadarItem(
+                id=row[0], source=row[1], source_id=row[2],
+                url=row[3], title=row[4],
+                published_at=None, collected_at=datetime.now(UTC),
+                github_full_name=row[7],
+                signals_json=json.loads(row[8]) if isinstance(row[8], str) else row[8],
+                tags_json=json.loads(row[9]) if isinstance(row[9], str) and row[9] else None,
+                scores_json=None,
+            )
+            items.append(item)
+
+        logger.info("Found %d candidate items in window for refresh", len(items))
+
+        # Deduplicate
+        items = deduplicate_items(items)
+        logger.info("%d items after deduplication (refresh)", len(items))
+
+        # Exclude items picked on previous days (not today — we compare against today's picks directly)
+        if reuse_window_days > 0:
+            excl_cutoff = (datetime.now(UTC) - timedelta(days=reuse_window_days)).strftime("%Y-%m-%d")
+            excl_rows = session.execute(
+                text("""
+                    SELECT DISTINCT item_id FROM daily_picks
+                    WHERE date >= :cutoff AND date < :today
+                """),
+                {"cutoff": excl_cutoff, "today": date_str},
+            ).fetchall()
+            excluded_ids = {r[0] for r in excl_rows}
+            if excluded_ids:
+                before = len(items)
+                items = [it for it in items if it.id not in excluded_ids]
+                logger.info(
+                    "Excluded %d recently-picked items (%d remain) during refresh",
+                    before - len(items), len(items),
+                )
+
+        # Score every candidate
+        scored = []
+        for item in items:
+            scores = score_item(item, weights)
+            scored.append((item, scores))
+            session.execute(
+                text("UPDATE radar_items SET scores_json = :scores WHERE id = :id"),
+                {"id": item.id, "scores": json.dumps(scores)},
+            )
+
+        # Sort by final score descending
+        scored.sort(key=lambda x: x[1]["final_score"], reverse=True)
+
+        # Apply source diversity to select the best daily_count candidates
+        if max_per_source < daily_count:
+            source_counts: dict[str, int] = {}
+            diverse_picks = []
+            overflow = []
+            for item, scores in scored:
+                src = item.source
+                count = source_counts.get(src, 0)
+                if count < max_per_source:
+                    diverse_picks.append((item, scores))
+                    source_counts[src] = count + 1
+                else:
+                    overflow.append((item, scores))
+                if len(diverse_picks) >= daily_count:
+                    break
+            if len(diverse_picks) < daily_count:
+                overflow.sort(key=lambda x: x[1]["final_score"], reverse=True)
+                diverse_picks.extend(overflow[:daily_count - len(diverse_picks)])
+            new_candidates = diverse_picks[:daily_count]
+        else:
+            new_candidates = scored[:daily_count]
+
+        # Fetch current pick scores from DB for comparison
+        current_scores: dict[str, float] = {}
+        for item_id in current_item_ids:
+            row = session.execute(
+                text("SELECT scores_json FROM radar_items WHERE id = :id"),
+                {"id": item_id},
+            ).fetchone()
+            if row and row[0]:
+                sc = json.loads(row[0]) if isinstance(row[0], str) else row[0]
+                current_scores[item_id] = sc.get("final_score", 0.0)
+            else:
+                current_scores[item_id] = 0.0
+
+        # Compare position-by-position and count replacements
+        replaced = 0
+        picks_unchanged = 0
+        new_pick_list = list(new_candidates)  # already ordered by rank
+
+        for i, (new_item, new_sc) in enumerate(new_pick_list):
+            if i < len(current_item_ids):
+                current_id = current_item_ids[i]
+                current_score = current_scores.get(current_id, 0.0)
+                if new_item.id != current_id and new_sc["final_score"] > current_score + min_score_delta:
+                    replaced += 1
+                    logger.info(
+                        "Rank %d: replacing %s (%.4f) with %s (%.4f)",
+                        i + 1, current_id, current_score,
+                        new_item.id, new_sc["final_score"],
+                    )
+                else:
+                    picks_unchanged += 1
+            else:
+                # New slot beyond current picks (shouldn't normally happen)
+                replaced += 1
+
+        # Only write to DB if there were replacements
+        if replaced > 0:
+            session.execute(text("DELETE FROM daily_picks WHERE date = :date"), {"date": date_str})
+            for rank, (item, _scores) in enumerate(new_pick_list, start=1):
+                session.execute(
+                    text("""
+                        INSERT INTO daily_picks (date, rank, item_id, created_at)
+                        VALUES (:date, :rank, :item_id, :created_at)
+                    """),
+                    {
+                        "date": date_str,
+                        "rank": rank,
+                        "item_id": item.id,
+                        "created_at": datetime.now(UTC).isoformat(),
+                    },
+                )
+            session.commit()
+            logger.info(
+                "rank_refresh: replaced %d picks, %d unchanged for %s",
+                replaced, picks_unchanged, date_str,
+            )
+        else:
+            session.commit()  # commit score updates
+            logger.info(
+                "rank_refresh: no replacements needed for %s (%d picks unchanged)",
+                date_str, picks_unchanged,
+            )
+
+    return {
+        "date": date_str,
+        "candidates": len(new_candidates),
+        "replaced": replaced,
+        "picks_unchanged": picks_unchanged,
+        "first_run": False,
     }

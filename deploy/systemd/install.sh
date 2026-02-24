@@ -50,8 +50,10 @@ install -m 0644 "$SCRIPT_DIR/github-digest-summarize.timer"      "$UNIT_DIR/gith
 install -m 0644 "$SCRIPT_DIR/github-digest-api.service"          "$UNIT_DIR/github-digest-api.service"
 install -m 0644 "$SCRIPT_DIR/github-digest-orchestrate.service"  "$UNIT_DIR/github-digest-orchestrate.service"
 install -m 0644 "$SCRIPT_DIR/github-digest-orchestrate.timer"    "$UNIT_DIR/github-digest-orchestrate.timer"
-install -m 0644 "$SCRIPT_DIR/github-digest-watchdog.service"     "$UNIT_DIR/github-digest-watchdog.service"
-install -m 0644 "$SCRIPT_DIR/github-digest-watchdog.timer"       "$UNIT_DIR/github-digest-watchdog.timer"
+install -m 0644 "$SCRIPT_DIR/github-digest-watchdog.service"          "$UNIT_DIR/github-digest-watchdog.service"
+install -m 0644 "$SCRIPT_DIR/github-digest-watchdog.timer"            "$UNIT_DIR/github-digest-watchdog.timer"
+install -m 0644 "$SCRIPT_DIR/github-digest-rank-refresh.service"      "$UNIT_DIR/github-digest-rank-refresh.service"
+install -m 0644 "$SCRIPT_DIR/github-digest-rank-refresh.timer"        "$UNIT_DIR/github-digest-rank-refresh.timer"
 
 systemctl daemon-reload
 
@@ -61,14 +63,17 @@ systemctl enable --now github-digest-summarize.timer
 systemctl enable --now github-digest-api.service
 systemctl enable --now github-digest-orchestrate.timer
 systemctl enable --now github-digest-watchdog.timer
+systemctl enable --now github-digest-rank-refresh.timer
 systemctl restart github-digest-fetch.timer github-digest-summarize.timer >/dev/null 2>&1 || true
 systemctl restart github-digest-orchestrate.timer github-digest-watchdog.timer >/dev/null 2>&1 || true
+systemctl restart github-digest-rank-refresh.timer >/dev/null 2>&1 || true
 systemctl restart github-digest-api.service >/dev/null 2>&1 || true
 
 systemctl status --no-pager github-digest-api.service || true
 systemctl status --no-pager github-digest-orchestrate.timer || true
 systemctl status --no-pager github-digest-watchdog.timer || true
+systemctl status --no-pager github-digest-rank-refresh.timer || true
 systemctl list-timers --no-pager | grep github-digest || true
 
-echo "Install complete. API is running, orchestrate and watchdog timers are enabled."
+echo "Install complete. API is running, orchestrate, watchdog, and rank-refresh timers are enabled."
 echo "Check logs: journalctl -u github-digest-orchestrate -f"

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 Daily pipeline orchestrator for Builder Radar.
-Runs the full pipeline: ingest_github, ingest_hn, ingest_devto, rank_daily, analyze_daily, pair_daily.
+Runs the full pipeline: ingest_github, ingest_hn, ingest_devto, ingest_github_trending, ingest_producthunt, rank_daily, analyze_daily, pair_daily.
 
 Usage:
-    python3 run_daily_pipeline.py [--date YYYY-MM-DD] [--skip-github] [--skip-hn] [--skip-devto] [--skip-llm]
+    python3 run_daily_pipeline.py [--date YYYY-MM-DD] [--skip-github] [--skip-hn] [--skip-devto] [--skip-trending] [--skip-producthunt] [--skip-llm]
 """
 from __future__ import annotations
 
@@ -33,6 +33,10 @@ def main() -> int:
                         help="Skip HN ingestion step")
     parser.add_argument("--skip-devto", action="store_true", default=False, dest="skip_devto",
                         help="Skip DEV.to ingestion step")
+    parser.add_argument("--skip-trending", action="store_true", default=False, dest="skip_trending",
+                        help="Skip GitHub Trending ingestion step")
+    parser.add_argument("--skip-producthunt", action="store_true", default=False, dest="skip_producthunt",
+                        help="Skip ProductHunt ingestion step")
     parser.add_argument("--skip-llm", action="store_true", default=False, dest="skip_llm",
                         help="Skip launching the background LLM analysis worker")
     args = parser.parse_args()
@@ -91,6 +95,34 @@ def main() -> int:
             errors.append(f"devto: {e}")
     else:
         logger.info("=== Step 2b: Skipping DEV.to ingestion ===")
+
+    # Step 2c — GitHub Trending ingestion
+    # GitHub Trending: high-buildability repos currently spiking
+    if not args.skip_trending:
+        logger.info("=== Step 2c: Ingest GitHub Trending ===")
+        try:
+            from github_digest.radar.github_trending_ingestion import ingest_github_trending
+            result = ingest_github_trending(db_path)
+            logger.info("GitHub Trending ingestion: %s", result)
+        except Exception as e:
+            logger.error("GitHub Trending ingestion failed: %s", e)
+            errors.append(f"github-trending: {e}")
+    else:
+        logger.info("=== Step 2c: Skipping GitHub Trending ingestion ===")
+
+    # Step 2d — ProductHunt ingestion
+    # ProductHunt: daily commercial/polished tool launches
+    if not args.skip_producthunt:
+        logger.info("=== Step 2d: Ingest ProductHunt RSS ===")
+        try:
+            from github_digest.radar.producthunt_ingestion import ingest_producthunt
+            result = ingest_producthunt(db_path)
+            logger.info("ProductHunt ingestion: %s", result)
+        except Exception as e:
+            logger.error("ProductHunt ingestion failed: %s", e)
+            errors.append(f"producthunt: {e}")
+    else:
+        logger.info("=== Step 2d: Skipping ProductHunt ingestion ===")
 
     # Step 3: Rank daily
     logger.info("=== Step 3: Rank daily (date=%s) ===", date_str)

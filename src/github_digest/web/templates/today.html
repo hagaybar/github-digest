@@ -20,6 +20,8 @@
     .source-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #eadfcd; color: #6a5d54; margin-bottom: 10px; }
     .source-badge.hn { background: #ff6600; color: #fff; }
     .source-badge.devto { background: #3b49df; color: #fff; }
+    .source-badge.trending { background: #1a7f37; color: #fff; }
+    .source-badge.ph { background: #da552f; color: #fff; }
     .unlock { font-style: italic; color: #4a3f36; margin: 8px 0; font-size: 14px; }
     .novelty { color: #6a5d54; font-size: 13px; margin: 4px 0 8px; }
     .why-cool { list-style: none; padding: 0; margin: 8px 0; }
@@ -37,6 +39,7 @@
     .signals { margin-top: 10px; font-size: 12px; color: #6a5d54; }
     .pending { color: #a08060; font-style: italic; font-size: 14px; padding: 16px 0; }
     .empty { color: #6a5d54; text-align: center; padding: 48px; }
+    .fallback-notice { color: #a08060; font-size: 13px; margin: -16px 0 16px; font-style: italic; }
   </style>
 </head>
 <body>
@@ -48,11 +51,15 @@
   <h1>Builder Radar</h1>
   <p class="subtitle">Today's 7 cool things &middot; {{ date }}</p>
 
+  {% if items and items[0].is_fallback %}
+  <p class="fallback-notice">&#8634; Showing picks from {{ items[0].actual_date }} &mdash; today's pipeline hasn't run yet.</p>
+  {% endif %}
+
   {% if items %}
   <div class="cards">
     {% for item in items %}
     <div class="card">
-      <span class="source-badge {% if item.source == 'hackernews' %}hn{% elif item.source == 'devto' %}devto{% endif %}">{% if item.source == 'hackernews' %}HN{% elif item.source == 'devto' %}DEV.to{% else %}{{ item.source }}{% endif %}</span>
+      <span class="source-badge {% if item.source == 'hackernews' %}hn{% elif item.source == 'devto' %}devto{% elif item.source == 'github_trending' %}trending{% elif item.source == 'producthunt' %}ph{% endif %}">{% if item.source == 'hackernews' %}HN{% elif item.source == 'devto' %}DEV.to{% elif item.source == 'github_trending' %}Trending{% elif item.source == 'producthunt' %}PH{% else %}{{ item.source }}{% endif %}</span>
       <h2><a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a></h2>
 
       {% if item.analysis %}
@@ -90,6 +97,7 @@
       <div class="signals">
         {% if item.signals.hn_points %}&#11014; {{ item.signals.hn_points }} HN pts{% endif %}
         {% if item.signals.github_stars_total %} &middot; &#11088; {{ item.signals.github_stars_total }}{% endif %}
+        {% if item.signals.github_trending_delta %} &middot; &#11088; +{{ item.signals.github_trending_delta }} today{% endif %}
         {% if item.github_full_name %} &middot; <a href="https://github.com/{{ item.github_full_name }}" target="_blank">{{ item.github_full_name }}</a>{% endif %}
         {% if item.signals.devto_reactions %} &middot; &#10084; {{ item.signals.devto_reactions }} DEV reactions{% endif %}
       </div>
