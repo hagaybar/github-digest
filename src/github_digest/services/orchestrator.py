@@ -527,6 +527,36 @@ def run_watchdog(date_str: str | None = None, stuck_minutes: int = 20) -> dict[s
         result["worker_restarted"] = restart_result
         result["healthy"] = False
 
+    elif stuck_state == "no_worker":
+        # No worker running — check if there are pending/processing items for today
+        pending_count = 0
+        try:
+            from sqlalchemy import text
+            from github_digest.db.database import get_engine
+            engine = get_engine(db_path)
+            with engine.begin() as conn:
+                row = conn.execute(
+                    text("""
+                        SELECT COUNT(*) FROM radar_item_analysis ria
+                        JOIN daily_picks dp ON dp.item_id = ria.item_id
+                        WHERE dp.date = :date
+                          AND ria.status IN ('pending', 'processing')
+                    """),
+                    {"date": date_str},
+                ).fetchone()
+                pending_count = row[0] if row else 0
+        except Exception as e:
+            logger.warning("Could not query pending analysis items: %s", e)
+
+        if pending_count > 0:
+            logger.warning(
+                "Worker not running but %d pending items found. Relaunching worker.",
+                pending_count,
+            )
+            restart_result = restart_stuck_worker(date_str, db_path, config_path, log_dir)
+            result["worker_relaunched"] = restart_result
+            result["healthy"] = False
+
     if not result.get("api_ok"):
         result["healthy"] = False
 
