@@ -155,7 +155,17 @@ def _board_new(
     stars_max: int = 500000,
     include_summary: bool = True,
 ) -> list[BoardItem]:
-    cutoff = datetime.now(timezone.utc) - timedelta(days=window_days)
+    # Anchor first_seen_at cutoff to the most recent discovery, not wall-clock "now".
+    # This ensures short windows (e.g. 24h) always show something even when the fetcher
+    # hasn't discovered truly new repos recently — "24h" means "from the latest fetch batch".
+    max_first_seen = session.execute(select(func.max(Repo.first_seen_at))).scalar()
+    if max_first_seen is None:
+        max_first_seen = datetime.now(timezone.utc)
+    elif max_first_seen.tzinfo is None:
+        max_first_seen = max_first_seen.replace(tzinfo=timezone.utc)
+
+    cutoff_last_seen = datetime.now(timezone.utc) - timedelta(days=window_days)
+    cutoff_first_seen = max_first_seen - timedelta(days=window_days)
     exclude_known = _exclude_known_filter(search.exclude_known)
 
     if include_summary:
@@ -172,8 +182,8 @@ def _board_new(
     stmt = (
         stmt
         .where(RepoSearch.query_name == search.name)
-        .where(RepoSearch.last_seen_at >= cutoff)
-        .where(Repo.first_seen_at >= cutoff)
+        .where(RepoSearch.last_seen_at >= cutoff_last_seen)
+        .where(Repo.first_seen_at >= cutoff_first_seen)
         .where(Repo.stars <= stars_max)
         .order_by(desc(Repo.first_seen_at), desc(Repo.stars))
         .limit(limit)
