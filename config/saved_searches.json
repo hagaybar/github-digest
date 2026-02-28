@@ -6,19 +6,40 @@
       "topic:llm language:python created:>2023-01-01 stars:50..10000",
       "topic:retrieval-augmented-generation language:python created:>2023-01-01 stars:50..10000"
     ],
-    "limit": 5
+    "limit": 50
+  },
+  {
+    "name": "llm-recent",
+    "label": "LLM & RAG",
+    "queries": [
+      "topic:llm language:python created:>2025-01-01 stars:10..5000",
+      "topic:retrieval-augmented-generation language:python created:>2025-01-01 stars:10..5000"
+    ],
+    "limit": 30
   },
   {
     "name": "information-retrieval",
     "label": "Information Retrieval",
     "query": "topic:information-retrieval created:>2023-01-01 stars:50..10000",
-    "limit": 5
+    "limit": 50
+  },
+  {
+    "name": "information-retrieval-recent",
+    "label": "Information Retrieval",
+    "query": "topic:information-retrieval created:>2025-01-01 stars:10..5000",
+    "limit": 30
   },
   {
     "name": "data-engineering",
     "label": "Data Engineering",
     "query": "topic:data-engineering created:>2023-01-01 stars:50..10000",
-    "limit": 5
+    "limit": 50
+  },
+  {
+    "name": "data-engineering-recent",
+    "label": "Data Engineering",
+    "query": "topic:data-engineering created:>2025-01-01 stars:10..5000",
+    "limit": 30
   },
   {
     "name": "academic",
@@ -27,6 +48,15 @@
       "topic:open-science language:python created:>2023-01-01 stars:50..5000",
       "topic:arxiv language:python created:>2023-01-01 stars:50..5000"
     ],
-    "limit": 3
+    "limit": 50
+  },
+  {
+    "name": "academic-recent",
+    "label": "Academic Innovation",
+    "queries": [
+      "topic:open-science language:python created:>2025-01-01 stars:10..5000",
+      "topic:arxiv language:python created:>2025-01-01 stars:10..5000"
+    ],
+    "limit": 30
   }
 ]
