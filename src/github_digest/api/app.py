@@ -264,6 +264,14 @@ def _get_today_items(db: Session, date_str: str) -> list[dict]:
             except Exception:
                 analysis = None
 
+        scores = row[6]
+        if isinstance(scores, str):
+            try:
+                scores = json.loads(scores)
+            except Exception:
+                scores = {}
+        scores = scores or {}
+
         items.append({
             "id": row[0],
             "source": row[1],
@@ -273,6 +281,7 @@ def _get_today_items(db: Session, date_str: str) -> list[dict]:
             "signals": signals,
             "analysis": analysis,
             "rank": row[8],
+            "score": scores.get("final_score", 0.0),
             "is_fallback": is_fallback,
             "actual_date": actual_date,
         })

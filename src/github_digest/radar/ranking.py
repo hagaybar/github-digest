@@ -156,8 +156,8 @@ def compute_buildability_score(item: RadarItem) -> float:
             # Log-scale: 100 stars → ~0.07, 1k → ~0.10, 10k → ~0.14, 50k → ~0.16
             score += 0.2 * min(1.0, math.log(max(1, stars)) / math.log(50000))
     else:
-        # Non-GitHub items: partial score based on URL quality
-        score = 0.2
+        # Non-GitHub items: no buildability score — avoids viral news dominating picks
+        score = 0.0
     if signals.get("hn_points", 0) and signals["hn_points"] > 10:
         score += 0.1
     return min(1.0, max(0.0, score))

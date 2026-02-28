@@ -211,6 +211,10 @@ def cmd_watchdog(args: argparse.Namespace) -> None:
     )
     print(json.dumps(result, indent=2))
     if not result.get("healthy"):
+        # Exit 0 when the worker was successfully relaunched — that is a recovery, not a failure
+        relaunched = result.get("worker_relaunched", {})
+        if isinstance(relaunched, dict) and relaunched.get("restarted"):
+            return
         raise SystemExit(1)
 
 
