@@ -72,8 +72,10 @@ def get_board_today(
     include_summary: bool = True,
 ) -> dict[str, list[dict[str, Any]]]:
     board: dict[str, list[dict[str, Any]]] = {}
+    seen_names: dict[str, set[str]] = {}
     for search in searches:
-        board[search.label or search.name] = get_board_for_query(
+        label = search.label or search.name
+        items = get_board_for_query(
             session,
             search,
             mode,
@@ -83,6 +85,13 @@ def get_board_today(
             stars_max,
             include_summary=include_summary,
         )
+        if label not in board:
+            board[label] = []
+            seen_names[label] = set()
+        for item in items:
+            if item["full_name"] not in seen_names[label]:
+                board[label].append(item)
+                seen_names[label].add(item["full_name"])
     return board
 
 
